@@ -1,0 +1,4 @@
+requests
+urllib3
+browser_cookie3
+pygame
