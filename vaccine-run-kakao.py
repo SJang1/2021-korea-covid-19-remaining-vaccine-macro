@@ -12,7 +12,7 @@ from http.cookiejar import CookieJar
 
 import urllib3
 
-search_time = 0.26  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
+search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
 urllib3.disable_warnings()
 
 
@@ -169,7 +169,7 @@ def try_reservation(organization_code, vaccine_type):
     reservation_url = 'https://vaccine.kakao.com/api/v1/reservation'
     for i in range(4):
         data = {"from": "Map", "vaccineCode": vaccine_type, "orgCode": organization_code, "distance": "null"}
-        response = requests.post(reservation_url, data=json.dumps(data), headers=headers.headers_vacc, cookies=CookieJar(), verify=False)
+        response = requests.post(reservation_url, data=json.dumps(data), headers=Headers.headers_vacc, cookies=CookieJar(), verify=False)
         response_json = json.loads(response.text)
         print(response_json)
         for key in response_json:
@@ -214,7 +214,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     while not done:
         time.sleep(search_time)
-        response = requests.post(url, data=json.dumps(data), headers=headers.headers_map, cookies=CookieJar(), verify=False)
+        response = requests.post(url, data=json.dumps(data), headers=Headers.headers_map, cookies=CookieJar(), verify=False)
 
         pretty_print(response.text)
         print(datetime.now())
@@ -237,7 +237,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     if vaccine_type == "ANY":  # ANY 백신 선택
         check_organization_url = f'https://vaccine.kakao.com/api/v2/org/org_code/{organization_code}'
-        check_organization_response = requests.get(check_organization_url, headers=headers.headers_vacc, cookies=CookieJar(), verify=False)
+        check_organization_response = requests.get(check_organization_url, headers=Headers.headers_vacc, cookies=CookieJar(), verify=False)
         check_organization_data = json.loads(check_organization_response.text).get("lefts")
         for x in check_organization_data:
             if x.get('leftCount') != 0:
