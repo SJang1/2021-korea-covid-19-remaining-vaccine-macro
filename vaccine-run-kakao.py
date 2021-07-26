@@ -140,7 +140,7 @@ def pretty_print(json_string):
             f"잔여갯수: {org.get('leftCounts')}\t상태: {org.get('status')}\t기관명: {org.get('orgName')}\t주소: {org.get('address')}")
 
 
-class headers:
+class Headers:
     headers_map = {
         "Accept": "application/json, text/plain, */*",
         "Content-Type": "application/json;charset=utf-8",
@@ -181,7 +181,7 @@ def try_reservation(organization_code, vaccine_type):
                 time.sleep(0.08)
             elif key == 'code' and value == "SUCCESS":
                 print("백신접종신청 성공!!!")
-                organization_code_success = response.get("organization")
+                organization_code_success = response_json.get("organization")
                 print(
                     f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}\t운영시간: {organization_code_success.get('openHour')}")
                 close()
@@ -215,7 +215,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     while not done:
         time.sleep(search_time)
         response = requests.post(url, data=json.dumps(data), headers=headers.headers_map, cookies=CookieJar(), verify=False)
-        status_code = response.status_code
 
         pretty_print(response.text)
         print(datetime.now())
