@@ -37,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: Windows-Binary
-          path: dist/vaccine-run-kakao-windows.exe
+          path: dist/vaccine-run-kakao.exe
 
 
   MacOS-Build:
@@ -68,4 +68,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: Mac-Binary
-          path: dist/vaccine-run-kakao-macos
+          path: dist/vaccine-run-kakao
