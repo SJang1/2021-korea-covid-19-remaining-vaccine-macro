@@ -32,7 +32,7 @@ jobs:
         python -m pip install -r requirements-dev.txt
     - name: Make OneFile
       run: |
-        pyinstaller --add-data tada.mp3;. --onefile vaccine-run-kakao.py
+        pyinstaller --add-data "tada.mp3;." --onefile vaccine-run-kakao.py
     - name: Zip Files
       uses: papeloto/action-zip@v1
       with:
