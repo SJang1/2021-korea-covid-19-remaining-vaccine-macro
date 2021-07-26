@@ -248,67 +248,68 @@ with open("config.ini", "w") as config_file:
 
 
 def find_vaccine():
-    print(APIdata)
+    try:
+        print(APIdata)
 
-    done = False
-    while done == False:
-        time.sleep(search_time)
-        response = requests.post(APIURL, data=json.dumps(APIdata), headers=headers.headers_map, cookies=jar,
-                                 verify=False)
+        done = False
+        while done == False:
+            time.sleep(search_time)
+            response = requests.post(APIURL, data=json.dumps(APIdata), headers=headers.headers_map, cookies=jar,
+                                     verify=False)
 
-        received_API_status_code = response.status_code
-        received_API_data = response.text
+            received_API_status_code = response.status_code
+            received_API_data = response.text
 
-        pretty_print(received_API_data)
-        print(datetime.datetime.now())
+            pretty_print(received_API_data)
+            print(datetime.datetime.now())
 
-        jsonloaded = json.loads(received_API_data)
-        jsonData = jsonloaded["organizations"]
-        found = False
-        for x in jsonData:
-            if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
-                found = x
-                done = True
-                break
-            # keys = x.keys()
-            # print(keys)
-            # values = x.values()
-            # print(values)
+            jsonloaded = json.loads(received_API_data)
+            jsonData = jsonloaded["organizations"]
+            found = False
+            for x in jsonData:
+                if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
+                    found = x
+                    done = True
+                    break
+                # keys = x.keys()
+                # print(keys)
+                # values = x.values()
+                # print(values)
 
-    print("--- found")
-    print(found)
-    orgCdCode = x.get('orgCode')
+        print("--- found")
+        print(found)
+        orgCdCode = x.get('orgCode')
 
-    # 실제 백신 남은수량 확인
-    VAC_found_code = ''
+        # 실제 백신 남은수량 확인
+        VAC_found_code = ''
 
-    if VAC != "ANY":  # 특정 백신 선택
-        VAC_found_code = VAC
-    else:  # ANY 백신 선택
-        Check_Org_URL = 'https://vaccine.kakao.com/api/v2/org/org_code/' + orgCdCode
-        Check_Org_response = requests.get(Check_Org_URL, headers=headers.headers_vacc, cookies=jar, verify=False)
-        # print(Check_Org_response.text)
-        Check_Org_jsonloaded = json.loads(Check_Org_response.text)
-        Check_Org_jsonData = Check_Org_jsonloaded["lefts"]
-        for x in Check_Org_jsonData:
-            if x.get('leftCount') != 0:
-                found = x
-                print(found)
-                VAC_found_code = x.get('vaccineCode')
-                break
-            else:
-                print("검색 도중 백신이 모두 소진되었습니다.")
+        if VAC != "ANY":  # 특정 백신 선택
+            VAC_found_code = VAC
+        else:  # ANY 백신 선택
+            Check_Org_URL = 'https://vaccine.kakao.com/api/v2/org/org_code/' + orgCdCode
+            Check_Org_response = requests.get(Check_Org_URL, headers=headers.headers_vacc, cookies=jar, verify=False)
+            # print(Check_Org_response.text)
+            Check_Org_jsonloaded = json.loads(Check_Org_response.text)
+            Check_Org_jsonData = Check_Org_jsonloaded["lefts"]
+            for x in Check_Org_jsonData:
+                if x.get('leftCount') != 0:
+                    found = x
+                    print(found)
+                    VAC_found_code = x.get('vaccineCode')
+                    break
+                else:
+                    print("검색 도중 백신이 모두 소진되었습니다.")
 
-    if VAC_found_code != '':
-        try_reservation(orgCdCode, VAC_found_code)
-    else:
+        if VAC_found_code != '':
+            try_reservation(orgCdCode, VAC_found_code)
+        else:
+            find_vaccine()
+    except:
+        print("예외 발생")
         find_vaccine()
 
 
 # ===================================== run ===================================== #
 
-try:
-    find_vaccine()
-    close()
-except:
-    print("에러 발생")
+find_vaccine()
+close()
