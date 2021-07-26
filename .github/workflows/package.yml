@@ -33,16 +33,11 @@ jobs:
     - name: Make OneFile
       run: |
         pyinstaller --add-data "tada.mp3;." --onefile vaccine-run-kakao.py
-    - name: Zip Files
-      uses: papeloto/action-zip@v1
-      with:
-          files: dist/
-          dest: vaccine-run-kakao-windows.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
           name: Windows-Binary
-          path: vaccine-run-kakao-windows.zip
+          path: dist/vaccine-run-kakao-windows.exe
 
 
   MacOS-Build:
@@ -69,13 +64,8 @@ jobs:
       run: |
         pyinstaller --add-data tada.mp3:. --onefile vaccine-run-kakao.py
         chmod +x dist/vaccine-run-kakao
-    - name: Zip Files
-      uses: papeloto/action-zip@v1
-      with:
-          files: dist/
-          dest: vaccine-run-kakao-macos.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
           name: Mac-Binary
-          path: vaccine-run-kakao-macos.zip
+          path: dist/vaccine-run-kakao-macos
