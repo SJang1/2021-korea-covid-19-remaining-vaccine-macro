@@ -307,5 +307,8 @@ def find_vaccine():
 
 # ===================================== run ===================================== #
 
-find_vaccine()
-close()
+try:
+    find_vaccine()
+    close()
+except:
+    print("에러 발생")
