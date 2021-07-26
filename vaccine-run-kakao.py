@@ -25,6 +25,13 @@ jar = browser_cookie3.chrome(domain_name=".kakao.com")
 
 skip_input = False
 
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
 def close():
     input("Press Enter to close...")
     sys.exit()
@@ -37,7 +44,7 @@ def clear():
 
 def play_sound():
     mixer.init()
-    mixer.music.load('tada.mp3')
+    mixer.music.load(resource_path('tada.mp3'))
     mixer.music.play()
 
 
