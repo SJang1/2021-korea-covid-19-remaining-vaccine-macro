@@ -228,8 +228,8 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     if found is None:
         find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-    print("--- found")
-    print(found)
+    print(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
+    print(f"주소는 : {found.get('address')} 입니다.")
     organization_code = found.get('orgCode')
 
     # 실제 백신 남은수량 확인
@@ -248,6 +248,10 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
             else:
                 print("검색 도중 백신이 모두 소진되었습니다.")
 
+    else:
+        VAC_found_code = VAC
+        print(f"{VAC_found_code} 으로 예약을 시도합니다.")
+
     if vaccine_type and try_reservation(organization_code, vaccine_type):
         return None
     else:
@@ -255,6 +259,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
 
 def main_function():
+    check_user_info_loaded()
     previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     if previous_used_type is None:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
