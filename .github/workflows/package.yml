@@ -32,11 +32,11 @@ jobs:
         python -m pip install -r requirements-dev.txt
     - name: Make OneFile
       run: |
-        pyinstaller --onefile vaccine-run-kakao.py
+        pyinstaller --add-data tada.mp3;. --onefile vaccine-run-kakao.py
     - name: Zip Files
       uses: papeloto/action-zip@v1
       with:
-          files: dist/ tada.mp3
+          files: dist/
           dest: vaccine-run-kakao-windows.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v2
@@ -67,12 +67,12 @@ jobs:
         python -m pip install -r requirements-dev.txt 
     - name: Make OneFile
       run: |
-        pyinstaller --onefile vaccine-run-kakao.py
+        pyinstaller --add-data tada.mp3:. --onefile vaccine-run-kakao.py
         chmod +x dist/vaccine-run-kakao
     - name: Zip Files
       uses: papeloto/action-zip@v1
       with:
-          files: dist/ tada.mp3
+          files: dist/
           dest: vaccine-run-kakao-macos.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v2
