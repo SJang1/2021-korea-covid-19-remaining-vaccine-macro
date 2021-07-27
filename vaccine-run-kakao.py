@@ -235,6 +235,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     # 실제 백신 남은수량 확인
     vaccine_type = ''
+    vaccine_found_code = None
 
     if vaccine_type == "ANY":  # ANY 백신 선택
         check_organization_url = f'https://vaccine.kakao.com/api/v2/org/org_code/{organization_code}'
@@ -244,7 +245,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
             if x.get('leftCount') != 0:
                 found = x
                 print(found)
-                vaccine_type = x.get('vaccineCode')
+                vaccine_found_code = x.get('vaccineCode')
                 break
             else:
                 print("검색 도중 백신이 모두 소진되었습니다.")
@@ -253,7 +254,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
         vaccine_found_code = vaccine_type
         print(f"{vaccine_found_code} 으로 예약을 시도합니다.")
 
-    if vaccine_type and try_reservation(organization_code, vaccine_type):
+    if vaccine_found_code and try_reservation(organization_code, vaccine_found_code):
         return None
     else:
         find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
