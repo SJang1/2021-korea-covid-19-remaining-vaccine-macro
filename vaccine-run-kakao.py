@@ -228,18 +228,34 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     found = None
 
     while not done:
-        time.sleep(search_time)
-        response = requests.post(url, data=json.dumps(data), headers=Headers.headers_map, verify=False)
+        try:
+            time.sleep(search_time)
+            response = requests.post(url, data=json.dumps(data), headers=Headers.headers_map, verify=False)
 
-        pretty_print(response.text)
-        print(datetime.now())
+            pretty_print(response.text)
+            print(datetime.now())
 
-        json_data = json.loads(response.text).get("organizations")
-        for x in json_data:
-            if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
-                found = x
-                done = True
-                break
+            json_data = json.loads(response.text).get("organizations")
+            for x in json_data:
+                if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
+                    found = x
+                    done = True
+                    break
+
+        except requests.exceptions.Timeout as timeouterror:
+            print("Timeout Error : ", timeouterror)
+
+        except requests.exceptions.ConnectionError as connectionerror:
+            print("Connecting Error : ", connectionerror)
+
+        except requests.exceptions.HTTPError as httperror:
+            print("Http Error : ", httperror)
+
+        except requests.exceptions.SSLError as sslerror:
+            print("SSL Error : ", sslerror)
+
+        except requests.exceptions.RequestException as error:
+            print("AnyException : ", error)
 
     if found is None:
         find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
