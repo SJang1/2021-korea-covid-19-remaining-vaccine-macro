@@ -234,7 +234,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     organization_code = found.get('orgCode')
 
     # 실제 백신 남은수량 확인
-    vaccine_type = ''
     vaccine_found_code = None
 
     if vaccine_type == "ANY":  # ANY 백신 선택
