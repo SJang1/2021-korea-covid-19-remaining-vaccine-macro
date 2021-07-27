@@ -1,2 +1,7 @@
 build/
 dist/
+config.ini
+*.spec
+.idea/
+__pycache__/vaccine-run-kakao.cpython-39.pyc
+venv/

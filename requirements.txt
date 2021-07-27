@@ -3,7 +3,7 @@ urllib3
 datetime
 configparser
 browser_cookie3
-pygame
+playsound
 ndg-httpsclient
 pyopenssl
 pyasn1
