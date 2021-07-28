@@ -31,22 +31,19 @@ jobs:
         python -m pip install pytest
         python -m pip install -r requirements.txt
         
-    - name: Checkout Pyinstaller
-      uses: actions/checkout@v2
+    - name: Download Pyinstaller from pyinstaller workflow
+      uses: dawidd6/action-download-artifact@v2
       with:
-        repository: pyinstaller/pyinstaller
-        ref: v4.4
-        path: pyinstaller
-  
-    - name: Build and Install Pyinstaller with own bootstrap
+        workflow: pyinstaller.yml
+        workflow_conclusion: success
+        name: pyinstaller_dist
+        path: pyinstaller_dist
+
+    - name: Install Pyinstaller with own bootstrap
       run: |
-        cd pyinstaller/bootloader
-        python waf distclean all --target-arch=32bit
-        python waf distclean all --target-arch=64bit
-        cd ..
-        python -m pip install .
-        cd ..
-  
+        cd pyinstaller_dist
+        python -m pip install --find-links=. pyinstaller
+
     - name: Make OneFile
       run: |
         pyinstaller --add-data "tada.mp3;." --onefile vaccine-run-kakao.py
