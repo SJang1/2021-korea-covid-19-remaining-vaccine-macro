@@ -30,18 +30,10 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pytest
         python -m pip install -r requirements.txt
-        
-    - name: Download Pyinstaller from pyinstaller workflow
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: pyinstaller.yml
-        workflow_conclusion: success
-        name: pyinstaller_dist
-        path: pyinstaller_dist
 
     - name: Install Pyinstaller with own bootstrap
       run: |
-        cd pyinstaller_dist
+        cd pyinstaller
         python -m pip install --find-links=. pyinstaller
 
     - name: Make OneFile
