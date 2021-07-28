@@ -49,7 +49,7 @@ jobs:
   
     - name: Make OneFile
       run: |
-        pyinstaller --add-data "tada.mp3;." --onefile vaccine-run-kakao.py
+        pyinstaller --add-data "*.mp3;." --onefile vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
@@ -80,7 +80,7 @@ jobs:
         python -m pip install -r requirements-dev.txt 
     - name: Make OneFile
       run: |
-        pyinstaller --add-data tada.mp3:. --onefile vaccine-run-kakao.py
+        pyinstaller --add-data "*.mp3:." --onefile vaccine-run-kakao.py
         chmod +x dist/vaccine-run-kakao
     - name: Upload artifact
       uses: actions/upload-artifact@v2
