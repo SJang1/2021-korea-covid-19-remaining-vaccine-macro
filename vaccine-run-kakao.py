@@ -7,11 +7,8 @@ import json
 import os
 import sys
 import time
-<<<<<<< HEAD
 import logging
-=======
 import http.cookiejar
->>>>>>> 96ac4778a787369e3fa7350b5f342685c486af99
 from playsound import playsound
 from datetime import datetime
 
