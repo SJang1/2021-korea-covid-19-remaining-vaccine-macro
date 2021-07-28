@@ -7,13 +7,22 @@ import json
 import os
 import sys
 import time
+import logging
 import http.cookiejar
 from playsound import playsound
 from datetime import datetime
 
 import urllib3
 
-search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
+logger = logging.getLogger(__name__)
+logLevel_info = {'logging.DEBUG': logging.DEBUG, 
+                 'logging.INFO': logging.INFO,
+                 'logging.WARNING': logging.WARNING,
+                 'logging.ERROR': logging.ERROR,
+                }
+#default 환경 변수값
+log_level = logging.INFO
+search_term = 0.35
 urllib3.disable_warnings()
 
 jar = http.cookiejar.CookieJar()
@@ -37,20 +46,22 @@ def load_config():
                     break
                 else:
                     print("Y 또는 N을 입력해 주세요.")
-
+                
             if skip_input:
                 # 설정 파일이 있으면 최근 로그인 정보 로딩
-                configuration = config_parser['config']
-                previous_used_type = configuration["VAC"]
-                previous_top_x = configuration["topX"]
-                previous_top_y = configuration["topY"]
-                previous_bottom_x = configuration["botX"]
-                previous_bottom_y = configuration["botY"]
+                log_level = logLevel_info.get(config_parser['PROGRAM']['LOG_LEVEL'], logging.INFO)
+                search_term = config_parser['PROGRAM']['SEARCH_TERM']
+                
+                previous_used_type = config_parser['config']["VAC"]
+                previous_top_x = config_parser['config']["topX"]
+                previous_top_y = config_parser['config']["topY"]
+                previous_bottom_x = config_parser['config']["botX"]
+                previous_bottom_y = config_parser['config']["botY"]
                 return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
             else:
-                return None, None, None, None, None
+                return None, None, None, None, None, None, None
         except ValueError:
-            return None, None, None, None, None
+            return None, None, None, None, None, None, None
     return None, None, None, None, None
 
 
@@ -59,9 +70,9 @@ def check_user_info_loaded():
     user_info_response = requests.get(user_info_api, headers=Headers.headers_vacc, cookies=jar, verify=False)
     user_info_json = json.loads(user_info_response.text)
     if user_info_json.get('error'):
-        print("사용자 정보를 불러오는데 실패하였습니다.")
-        print("Chrome 브라우저에서 카카오에 제대로 로그인되어있는지 확인해주세요.")
-        print("로그인이 되어 있는데도 안된다면, 카카오톡에 들어가서 잔여백신 알림 신청을 한번 해보세요. 정보제공 동의가 나온다면 동의 후 다시 시도해주세요.")
+        logger.info("사용자 정보를 불러오는데 실패하였습니다.")
+        logger.info("Chrome 브라우저에서 카카오에 제대로 로그인되어있는지 확인해주세요.")
+        logger.info("로그인이 되어 있는데도 안된다면, 카카오톡에 들어가서 잔여백신 알림 신청을 한번 해보세요. 정보제공 동의가 나온다면 동의 후 다시 시도해주세요.")
         close()
     else:
         user_info = user_info_json.get("user")
@@ -71,22 +82,22 @@ def check_user_info_loaded():
             if key != 'status':
                 continue
             if key == 'status' and value == "NORMAL":
-                print("사용자 정보를 불러오는데 성공했습니다.")
+                logger.info("사용자 정보를 불러오는데 성공했습니다.")
                 break
             else:
-                print("이미 접종이 완료되었거나 예약이 완료된 사용자입니다.")
+                logger.info("이미 접종이 완료되었거나 예약이 완료된 사용자입니다.")
                 close()
 
 
 def input_config():
     vaccine_type = None
     while vaccine_type is None:
-        print("예약시도할 백신 코드를 알려주세요.")
-        print("화이자         : VEN00013")
-        print("모더나         : VEN00014")
-        print("아스크라제네카   : VEN00015")
-        print("얀센          : VEN00016")
-        print("아무거나       : ANY")
+        logger.info("예약시도할 백신 코드를 알려주세요.")
+        logger.info("화이자         : VEN00013")
+        logger.info("모더나         : VEN00014")
+        logger.info("아스크라제네카   : VEN00015")
+        logger.info("얀센          : VEN00016")
+        logger.info("아무거나       : ANY")
         vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요."))
 
     print("사각형 모양으로 백신범위를 지정한 뒤, 해당 범위 안에 있는 백신을 조회해서 남은 백신이 있으면 Chrome 브라우저를 엽니다.")
@@ -113,6 +124,10 @@ def input_config():
 
 def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     config_parser = configparser.ConfigParser()
+    for key, val in logLevel_info.items():
+        if val == log_level:
+            config_parser['PROGRAM'] = {'log_level': key, 'search_term': search_term}
+            break
     config_parser['config'] = {}
     conf = config_parser['config']
     conf['VAC'] = vaccine_type
@@ -123,6 +138,23 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     with open("config.ini", "w") as config_file:
         config_parser.write(config_file)
+
+def create_logger(log_level):
+    #파일로거 설정
+    logging.basicConfig(encoding='utf-8', level=log_level)
+    
+    #Formatter 생성
+    logFormatter = logging.Formatter('[%(asctime)s][%(levelname)s]<%(filename)s:%(lineno)s> %(message)s')
+    
+    #핸들러 생성 및 formatter 설정 후 Logger 인스턴스에 핸들러 연결
+    consoleHdr = logging.StreamHandler()
+    consoleHdr.setFormatter(logFormatter)
+    logger.addHandler(consoleHdr)
+    fileHdr = logging.FileHandler('./' + datetime.today().strftime('%Y_%m_%d') + '.log')	#실행파일 위치에 년_월_일.log 파일생
+    fileHdr.setFormatter(logFormatter)
+    logger.addHandler(fileHdr)
+    
+    logger.info('프로그램을 시작합니다')
 
 
 def close():
@@ -151,8 +183,7 @@ def pretty_print(json_object):
     for org in json_object["organizations"]:
         if org.get('status') == "CLOSED" or org.get('status') == "EXHAUSTED":
             continue
-        print(
-            f"잔여갯수: {org.get('leftCounts')}\t상태: {org.get('status')}\t기관명: {org.get('orgName')}\t주소: {org.get('address')}")
+        logger.info(f"잔여갯수: {org.get('leftCounts')}\t상태: {org.get('status')}\t기관명: {org.get('orgName')}\t주소: {org.get('address')}")
 
 
 class Headers:
@@ -207,6 +238,7 @@ def try_reservation(organization_code, vaccine_type):
             print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
             print(response.text)
             close()
+
     return None
 
 def retry_reservation(organization_code, vaccine_type):
@@ -260,13 +292,13 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     while not done:
         try:
-            time.sleep(search_time)
+            time.sleep(search_term)
             response = requests.post(url, data=json.dumps(data), headers=Headers.headers_map, verify=False)
 
             json_data = json.loads(response.text)
 
             pretty_print(json_data)
-            print(datetime.now())
+            logger.info('========================')
 
             for x in json_data.get("organizations"):
                 if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
@@ -275,34 +307,34 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
                     break
 
         except json.decoder.JSONDecodeError as decodeerror:
-            print("JSONDecodeError : ", decodeerror)
-            print("JSON string : ", response.text)
+            logger.warning("JSONDecodeError : ", decodeerror)
+            logger.warning("JSON string : ", response.text)
             close()
 
         except requests.exceptions.Timeout as timeouterror:
-            print("Timeout Error : ", timeouterror)
+            logger.warning("Timeout Error : ", timeouterror)
             close()
 
         except requests.exceptions.ConnectionError as connectionerror:
-            print("Connecting Error : ", connectionerror)
+            logger.warning("Connecting Error : ", connectionerror)
             close()
 
         except requests.exceptions.HTTPError as httperror:
-            print("Http Error : ", httperror)
+            logger.warning("Http Error : ", httperror)
             close()
 
         except requests.exceptions.SSLError as sslerror:
-            print("SSL Error : ", sslerror)
+            logger.warning("SSL Error : ", sslerror)
             close()
 
         except requests.exceptions.RequestException as error:
-            print("AnyException : ", error)
+            logger.warning("AnyException : ", error)
             close()
 
     if found is None:
-        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-    print(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
-    print(f"주소는 : {found.get('address')} 입니다.")
+        find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+    logger.info(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
+    logger.info(f"주소는 : {found.get('address')} 입니다.")
     organization_code = found.get('orgCode')
 
     # 실제 백신 남은수량 확인
@@ -316,15 +348,15 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
         for x in check_organization_data:
             if x.get('leftCount') != 0:
                 found = x
-                print(f"{x.get('vaccineName')} 백신을 {x.get('leftCount')}개 발견했습니다.")
+                logger.info(f"{x.get('vaccineName')} 백신을 {x.get('leftCount')}개 발견했습니다.")
                 vaccine_found_code = x.get('vaccineCode')
                 break
             else:
-                print(f"{x.get('vaccineName')} 백신이 없습니다.")
+                logger.info(f"{x.get('vaccineName')} 백신이 없습니다.")
 
     else:
         vaccine_found_code = vaccine_type
-        print(f"{vaccine_found_code} 으로 예약을 시도합니다.")
+        logger.info(f"{vaccine_found_code} 으로 예약을 시도합니다.")
 
     if vaccine_found_code and try_reservation(organization_code, vaccine_found_code):
         return None
@@ -333,8 +365,10 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
 
 def main_function():
-    check_user_info_loaded()
     previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
+    create_logger(log_level)    
+    check_user_info_loaded()
+    
     if previous_used_type is None:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
     else:
