@@ -20,7 +20,6 @@ logLevel_info = {'logging.DEBUG': logging.DEBUG,
                  'logging.WARNING': logging.WARNING,
                  'logging.ERROR': logging.ERROR,
                 }
-search_time = 0.3  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 0.3초
 urllib3.disable_warnings()
 
 jar = http.cookiejar.CookieJar()
@@ -29,39 +28,38 @@ jar = browser_cookie3.chrome(domain_name=".kakao.com")
 
 # 기존 입력 값 로딩
 def load_config():
-	config_parser = configparser.ConfigParser()
-	if os.path.exists('config.ini'):
-		try:
-			config_parser.read('config.ini')
-
-			while True:
-				skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
-				if skip_input == "y":
-				    skip_input = True
-				    break
-				elif skip_input == "n":
-				    skip_input = False
-				    break
-				else:
-				    print("Y 또는 N을 입력해 주세요.")
-				
-			if skip_input:
-				# 설정 파일이 있으면 최근 로그인 정보 로딩
-				log_level = logLevel_info.get(config_parser['PROGRAM']['LOG_LEVEL'], logging.INFO)
-				search_term = config_parser['PROGRAM']["SEARCH_TERM"]
-				retry_cnt = config_parser['PROGRAM']["RETRY_CNT"]
-				
-				previous_used_type = config_parser['config']["VAC"]
-				previous_top_x = config_parser['config']["topX"]
-				previous_top_y = config_parser['config']["topY"]
-				previous_bottom_x = config_parser['config']["botX"]
-				previous_bottom_y = config_parser['config']["botY"]
-				return log_level, search_term, retry_cnt, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
-			else:
-				return None, None, None, None, None, None, None, None
-		except ValueError:
-			return None, None, None, None, None, None, None, None
-	return None, None, None, None, None, None, None, None
+    config_parser = configparser.ConfigParser()
+    if os.path.exists('config.ini'):
+        try:
+            config_parser.read('config.ini')
+        
+            while True:
+                skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
+                if skip_input == "y":
+                    skip_input = True
+                    break
+                elif skip_input == "n":
+                    skip_input = False
+                    break
+                else:
+                    print("Y 또는 N을 입력해 주세요.")
+                
+            if skip_input:
+                # 설정 파일이 있으면 최근 로그인 정보 로딩
+                log_level = logLevel_info.get(config_parser['PROGRAM']['LOG_LEVEL'], logging.INFO)
+                search_term = config_parser['PROGRAM']["SEARCH_TERM"]
+                
+                previous_used_type = config_parser['config']["VAC"]
+                previous_top_x = config_parser['config']["topX"]
+                previous_top_y = config_parser['config']["topY"]
+                previous_bottom_x = config_parser['config']["botX"]
+                previous_bottom_y = config_parser['config']["botY"]
+                return log_level, search_term, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
+            else:
+                return None, None, None, None, None, None, None
+        except ValueError:
+            return None, None, None, None, None, None, None
+    return None, None, None, None, None, None, None
 
 
 def check_user_info_loaded():
@@ -207,9 +205,9 @@ class Headers:
     }
 
 
-def try_reservation(retry_cnt, organization_code, vaccine_type):
+def try_reservation(organization_code, vaccine_type):
     reservation_url = 'https://vaccine.kakao.com/api/v1/reservation'
-    for i in range(int(retry_cnt)):
+    for i in range(2):
         data = {"from": "Map", "vaccineCode": vaccine_type, "orgCode": organization_code, "distance": "null"}
         response = requests.post(reservation_url, data=json.dumps(data), headers=Headers.headers_vacc, cookies=jar,
                                  verify=False)
@@ -248,7 +246,7 @@ def try_reservation(retry_cnt, organization_code, vaccine_type):
 #     print(cookie)
 
 
-def find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, bottom_y):
+def find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y):
     url = 'https://vaccine-map.kakao.com/api/v2/vaccine/left_count_by_coords'
     data = {"bottomRight": {"x": bottom_x, "y": bottom_y}, "onlyLeft": False, "order": "latitude",
             "topLeft": {"x": top_x, "y": top_y}}
@@ -297,7 +295,7 @@ def find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, b
             close()
 
     if found is None:
-        find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
     logger.info(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
     logger.info(f"주소는 : {found.get('address')} 입니다.")
     organization_code = found.get('orgCode')
@@ -323,14 +321,14 @@ def find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, b
         vaccine_found_code = vaccine_type
         logger.info(f"{vaccine_found_code} 으로 예약을 시도합니다.")
 
-    if vaccine_found_code and try_reservation(retry_cnt, organization_code, vaccine_found_code):
+    if vaccine_found_code and try_reservation(organization_code, vaccine_found_code):
         return None
     else:
-        find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
 
 
 def main_function():
-    log_level, search_term, retry_cnt, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
+    log_level, search_term, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     create_logger(log_level)    
     check_user_info_loaded()
     
@@ -338,7 +336,7 @@ def main_function():
         vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
-    find_vaccine(search_term, retry_cnt, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+    find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
     close()
 
 
