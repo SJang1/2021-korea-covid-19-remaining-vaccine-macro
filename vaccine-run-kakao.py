@@ -145,8 +145,7 @@ def play_tada():
     playsound(resource_path('tada.mp3'))
 
 
-def pretty_print(json_string):
-    json_object = json.loads(json_string)
+def pretty_print(json_object):
     for org in json_object["organizations"]:
         if org.get('status') == "CLOSED" or org.get('status') == "EXHAUSTED":
             continue
@@ -233,15 +232,20 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
             time.sleep(search_time)
             response = requests.post(url, data=json.dumps(data), headers=Headers.headers_map, verify=False)
 
-            pretty_print(response.text)
+            json_data = json.loads(response.text)
+
+            pretty_print(json_data)
             print(datetime.now())
 
-            json_data = json.loads(response.text).get("organizations")
-            for x in json_data:
+            for x in json_data.get("organizations"):
                 if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
                     found = x
                     done = True
                     break
+
+        except json.decoder.JSONDecodeError as decodeerror:
+            print("JSONDecodeError : ", decodeerror)
+            print("JSON string : ", response.text)
 
         except requests.exceptions.Timeout as timeouterror:
             print("Timeout Error : ", timeouterror)
