@@ -123,15 +123,6 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
         config_parser.write(config_file)
 
 
-def close(success=False):
-    if success: 
-        play_tada()
-    else:
-        play_xylophon()
-    input("Press Enter to close...")
-    sys.exit()
-
-
 def clear():
     if 'win' in sys.platform.lower():
         os.system('cls')
@@ -151,6 +142,15 @@ def play_tada():
 
 def play_xylophon():
     playsound(resource_path('xylophon.mp3'))
+
+
+def close(success=False):
+    if success: 
+        play_tada()
+    else:
+        play_xylophon()
+    input("Press Enter to close...")
+    sys.exit()
 
 
 def pretty_print(json_object):
