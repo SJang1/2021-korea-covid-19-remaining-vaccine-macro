@@ -24,7 +24,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-        architecture: x86
 
     - name: Install dependencies
       run: |
@@ -36,17 +35,18 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: pyinstaller/pyinstaller
-        ref: v4.3
+        ref: v4.4
         path: pyinstaller
   
     - name: Build and Install Pyinstaller with own bootstrap
       run: |
         cd pyinstaller/bootloader
         python waf distclean all --target-arch=32bit
+        python waf distclean all --target-arch=64bit
         cd ..
         python -m pip install .
         cd ..
-
+  
     - name: Make OneFile
       run: |
         pyinstaller --add-data "tada.mp3;." --onefile vaccine-run-kakao.py
@@ -55,6 +55,7 @@ jobs:
       with:
           name: Windows-Binary
           path: dist/vaccine-run-kakao.exe
+
 
   MacOS-Build:
 
