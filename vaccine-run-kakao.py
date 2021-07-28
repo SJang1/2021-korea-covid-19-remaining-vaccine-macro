@@ -20,6 +20,9 @@ logLevel_info = {'logging.DEBUG': logging.DEBUG,
                  'logging.WARNING': logging.WARNING,
                  'logging.ERROR': logging.ERROR,
                 }
+#default 환경 변수값
+log_level = logging.INFO
+search_term = 0.35
 urllib3.disable_warnings()
 
 jar = http.cookiejar.CookieJar()
@@ -32,7 +35,7 @@ def load_config():
     if os.path.exists('config.ini'):
         try:
             config_parser.read('config.ini')
-        
+
             while True:
                 skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
                 if skip_input == "y":
@@ -47,19 +50,19 @@ def load_config():
             if skip_input:
                 # 설정 파일이 있으면 최근 로그인 정보 로딩
                 log_level = logLevel_info.get(config_parser['PROGRAM']['LOG_LEVEL'], logging.INFO)
-                search_term = config_parser['PROGRAM']["SEARCH_TERM"]
+                search_term = config_parser['PROGRAM']['SEARCH_TERM']
                 
                 previous_used_type = config_parser['config']["VAC"]
                 previous_top_x = config_parser['config']["topX"]
                 previous_top_y = config_parser['config']["topY"]
                 previous_bottom_x = config_parser['config']["botX"]
                 previous_bottom_y = config_parser['config']["botY"]
-                return log_level, search_term, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
+                return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
             else:
                 return None, None, None, None, None, None, None
         except ValueError:
             return None, None, None, None, None, None, None
-    return None, None, None, None, None, None, None
+    return None, None, None, None, None
 
 
 def check_user_info_loaded():
@@ -121,6 +124,10 @@ def input_config():
 
 def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     config_parser = configparser.ConfigParser()
+    for key, val in logLevel_info.items():
+        if val == log_level:
+            config_parser['PROGRAM'] = {'log_level': key, 'search_term': search_term}
+            break
     config_parser['config'] = {}
     conf = config_parser['config']
     conf['VAC'] = vaccine_type
@@ -133,22 +140,21 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
         config_parser.write(config_file)
 
 def create_logger(log_level):
-	#파일로거 설정
-	#Logger 인스턴스 생성
-	logging.basicConfig(encoding='utf-8', level=log_level)
-	
-	#Formatter 생성
-	logFormatter = logging.Formatter('[%(asctime)s][%(levelname)s]<%(filename)s:%(lineno)s> %(message)s')
-	
-	#핸들러 생성 및 formatter 설정 후 Logger 인스턴스에 핸들러 연결
-	consoleHdr = logging.StreamHandler()
-	consoleHdr.setFormatter(logFormatter)
-	logger.addHandler(consoleHdr)
-	fileHdr = logging.FileHandler('./' + datetime.today().strftime('%Y_%m_%d') + '.log')	#실행파일 위치에 년_월_일.log 파일생
-	fileHdr.setFormatter(logFormatter)
-	logger.addHandler(fileHdr)
-	
-	logger.info('프로그램을 시작합니다')
+    #파일로거 설정
+    logging.basicConfig(encoding='utf-8', level=log_level)
+    
+    #Formatter 생성
+    logFormatter = logging.Formatter('[%(asctime)s][%(levelname)s]<%(filename)s:%(lineno)s> %(message)s')
+    
+    #핸들러 생성 및 formatter 설정 후 Logger 인스턴스에 핸들러 연결
+    consoleHdr = logging.StreamHandler()
+    consoleHdr.setFormatter(logFormatter)
+    logger.addHandler(consoleHdr)
+    fileHdr = logging.FileHandler('./' + datetime.today().strftime('%Y_%m_%d') + '.log')	#실행파일 위치에 년_월_일.log 파일생
+    fileHdr.setFormatter(logFormatter)
+    logger.addHandler(fileHdr)
+    
+    logger.info('프로그램을 시작합니다')
 
 
 def close():
@@ -246,7 +252,7 @@ def try_reservation(organization_code, vaccine_type):
 #     print(cookie)
 
 
-def find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y):
+def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     url = 'https://vaccine-map.kakao.com/api/v2/vaccine/left_count_by_coords'
     data = {"bottomRight": {"x": bottom_x, "y": bottom_y}, "onlyLeft": False, "order": "latitude",
             "topLeft": {"x": top_x, "y": top_y}}
@@ -324,11 +330,11 @@ def find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y):
     if vaccine_found_code and try_reservation(organization_code, vaccine_found_code):
         return None
     else:
-        find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
 
 
 def main_function():
-    log_level, search_term, previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
+    previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     create_logger(log_level)    
     check_user_info_loaded()
     
@@ -336,7 +342,7 @@ def main_function():
         vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
-    find_vaccine(search_term, vaccine_type, top_x, top_y, bottom_x, bottom_y)
+    find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
     close()
 
 
