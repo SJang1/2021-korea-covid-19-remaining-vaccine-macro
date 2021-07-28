@@ -1,0 +1,42 @@
+name: Build PyInstaller
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build pyinstaller for windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout pyinstaller
+        uses: actions/checkout@v2
+        with:
+          repository: pyinstaller/pyinstaller
+          ref: v4.4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Build 32bit bootloader
+        run: |
+          cd bootloader
+          python waf distclean all --target-arch=32bit
+
+      - name: Build 64bit bootloader
+        run: |
+          cd bootloader
+          python waf distclean all --target-arch=64bit
+
+      - name: Build packages
+        run: |
+          python -m pip install wheel
+          python setup.py sdist bdist_wheel
+
+      - name: Archive packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: pyinstaller_dist
+          path: dist/*
+          retention-days: 90

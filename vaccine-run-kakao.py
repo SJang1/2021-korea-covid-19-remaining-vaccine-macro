@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import time
+import http.cookiejar
 from playsound import playsound
 from datetime import datetime
 
@@ -15,6 +16,7 @@ import urllib3
 search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
 urllib3.disable_warnings()
 
+jar = http.cookiejar.CookieJar()
 jar = browser_cookie3.chrome(domain_name=".kakao.com")
 
 
@@ -167,7 +169,7 @@ class Headers:
         "Content-Type": "application/json;charset=utf-8",
         "Origin": "https://vaccine-map.kakao.com",
         "Accept-Language": "en-us",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.4.2",
         "Referer": "https://vaccine-map.kakao.com/",
         "Accept-Encoding": "gzip, deflate",
         "Connection": "Keep-Alive",
@@ -178,7 +180,7 @@ class Headers:
         "Content-Type": "application/json;charset=utf-8",
         "Origin": "https://vaccine.kakao.com",
         "Accept-Language": "en-us",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.3.8",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 9.4.2",
         "Referer": "https://vaccine.kakao.com/",
         "Accept-Encoding": "gzip, deflate",
         "Connection": "Keep-Alive",
@@ -188,31 +190,58 @@ class Headers:
 
 def try_reservation(organization_code, vaccine_type):
     reservation_url = 'https://vaccine.kakao.com/api/v1/reservation'
-    for i in range(2):
-        data = {"from": "Map", "vaccineCode": vaccine_type, "orgCode": organization_code, "distance": "null"}
-        response = requests.post(reservation_url, data=json.dumps(data), headers=Headers.headers_vacc, cookies=jar,
-                                 verify=False)
-        response_json = json.loads(response.text)
-        print(response_json)
-        for key in response_json:
-            value = response_json[key]
-            if key != 'code':
-                continue
-            if key == 'code' and value == "NO_VACANCY":
-                print("잔여백신 접종 신청이 선착순 마감되었습니다.")
-                time.sleep(0.08)
-            elif key == 'code' and value == "SUCCESS":
-                print("백신접종신청 성공!!!")
-                organization_code_success = response_json.get("organization")
-                print(
-                    f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}\t운영시간: {organization_code_success.get('openHour')}")
-                close(success=True)
-            else:
-                print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
-                print(response.text)
-                close()
+    data = {"from": "Map", "vaccineCode": vaccine_type, "orgCode": organization_code, "distance": "null"}
+    response = requests.post(reservation_url, data=json.dumps(data), headers=Headers.headers_vacc, cookies=jar, verify=False)
+    response_json = json.loads(response.text)
+    for key in response_json:
+        value = response_json[key]
+        if key != 'code':
+            continue
+        if key == 'code' and value == "NO_VACANCY":
+            print("잔여백신 접종 신청이 선착순 마감되었습니다.")
+            time.sleep(0.08)
+        elif key == 'code' and value == "TIMEOUT":
+            print("TIMEOUT, 예약을 재시도합니다.")
+            retry_reservation(organization_code, vaccine_type)
+        elif key == 'code' and value == "SUCCESS":
+            print("백신접종신청 성공!!!")
+            organization_code_success = response_json.get("organization")
+            print(
+                f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}")
+            close(success=True)
+        else:
+            print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
+            print(response.text)
+            close()
     return None
 
+def retry_reservation(organization_code, vaccine_type):
+    reservation_url = 'https://vaccine.kakao.com/api/v1/reservation/retry'
+
+    data = {"from": "Map", "vaccineCode": vaccine_type, "orgCode": organization_code, "distance": "null"}
+    response = requests.post(reservation_url, data=json.dumps(data), headers=Headers.headers_vacc, cookies=jar, verify=False)
+    response_json = json.loads(response.text)
+    for key in response_json:
+        value = response_json[key]
+        if key != 'code':
+            continue
+        if key == 'code' and value == "NO_VACANCY":
+            print("잔여백신 접종 신청이 선착순 마감되었습니다.")
+            time.sleep(0.08)
+        elif key == 'code' and value == "TIMEOUT":
+            print("TIMEOUT(서버오류).. 예약이 성공했을 수도 실패했을 수도 있으나, 우선은 실패했다고 생각하세요.")
+            print(response.text)
+        elif key == 'code' and value == "SUCCESS":
+            print("백신접종신청 성공!!!")
+            organization_code_success = response_json.get("organization")
+            print(
+                f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}")
+            close(success=True)
+        else:
+            print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
+            print(response.text)
+            close()
+    return None
 
 # ===================================== def ===================================== #
 
