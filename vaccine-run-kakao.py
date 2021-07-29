@@ -84,7 +84,7 @@ def input_config():
         print("예약시도할 백신 코드를 알려주세요.")
         print("화이자         : VEN00013")
         print("모더나         : VEN00014")
-        print("아스크라제네카   : VEN00015")
+        print("아스트라제네카   : VEN00015")
         print("얀센          : VEN00016")
         print("아무거나       : ANY")
         vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요."))
