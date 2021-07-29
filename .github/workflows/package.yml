@@ -16,6 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        # A list of files, directories, and wildcard patterns to cache and restore
+        path: |
+          c:\hostedtoolcache
+          ~/AppData\Local\Nuitka\Nuitka
+        # An explicit key for restoring and saving the cache
+        key: ${{ runner.os }}-build-cache
+        restore_keys: |
+          ${{ runner.os }}-build-cache
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
