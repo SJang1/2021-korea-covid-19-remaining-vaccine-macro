@@ -58,7 +58,7 @@ jobs:
         python -m pip install -r requirements.txt -r requirements-mac.txt -r requirements-dev.txt
     - name: Make OneFile
       run: |
-        python -m nuitka --assume-yes-for-downloads --include-data-file="./*.mp3=./" --onefile --debug -j $(nproc) -o vaccine-run-kakao vaccine-run-kakao.py
+        python -m nuitka --assume-yes-for-downloads --include-data-file="./*.mp3=./" --onefile --debug -o vaccine-run-kakao vaccine-run-kakao.py
     - name: Tar file
       run: tar -cvf vaccine-run-kakao.tar vaccine-run-kakao
     - name: Upload artifact
