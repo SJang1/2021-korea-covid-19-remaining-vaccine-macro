@@ -30,7 +30,7 @@ jobs:
 
     - name: Make OneFile
       run: |
-        nuitka --assume-yes-for-downloads --verbose --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
+        nuitka --assume-yes-for-downloads --verbose --no-progress --include-data-file="./*.mp3=./" --clang --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
