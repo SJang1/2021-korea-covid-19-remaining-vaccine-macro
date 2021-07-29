@@ -1,7 +1,11 @@
 build/
 dist/
 config.ini
+telegram.txt
 *.spec
 .idea/
 __pycache__/vaccine-run-kakao.cpython-39.pyc
 venv/
+# Who uses Pipfile?
+Pipfile
+Pipfile.lock
