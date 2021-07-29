@@ -350,13 +350,12 @@ def send_msg(msg):
     if os.path.exists('telegram.txt'):
         try:
             tgparser.read('telegram.txt')
-            while True:
-                print("Telegram으로 결과를 전송합니다.")
-                tgtoken = tgparser["telegram"]["token"]
-                tgid = tgparser["telegram"]["chatid"]
-                bot = telepot.Bot(tgtoken)
-                bot.sendMessage(tgid, msg)
-                return
+            print("Telegram으로 결과를 전송합니다.")
+            tgtoken = tgparser["telegram"]["token"]
+            tgid = tgparser["telegram"]["chatid"]
+            bot = telepot.Bot(tgtoken)
+            bot.sendMessage(tgid, msg)
+            return
         except:
             return
 
