@@ -3,7 +3,10 @@ urllib3
 datetime
 configparser
 browser_cookie3
-playsound
 ndg-httpsclient
 pyopenssl
 pyasn1
+
+# playsound 1.3.0, with windows fix. (1 commit ahead from 1.3.0 release)
+# See TaylorSMarks/playsound#75, TaylorSMarks/playsound#76
+https://codeload.github.com/TaylorSMarks/playsound/tar.gz/cff129a2dd712f78bb4773412b293d737dbfc6e9#egg=playsound
