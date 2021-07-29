@@ -3,11 +3,7 @@
 
 name: Python package
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
   Windows-Build:
@@ -29,22 +25,16 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest wheel
-        python -m pip install -r requirements.txt
-
-    - name: Install Pyinstaller with own bootstrap
-      run: |
-        cd pyinstaller
-        unzip -P pyinstaller pyinstaller.zip
-        python -m pip install ./pyinstaller-4.4-py3-none-any.whl
+        python -m pip install -r requirements.txt -r requirements-dev.txt
 
     - name: Make OneFile
       run: |
-        pyinstaller --add-data "*.mp3;." --onefile vaccine-run-kakao.py
+        nuitka --assume-yes-for-downloads --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
           name: Windows-Binary
-          path: dist/vaccine-run-kakao.exe
+          path: vaccine-run-kakao.exe
 
 
   MacOS-Build:
@@ -64,16 +54,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest
-        python -m pip install -r requirements.txt
-        python -m pip install -r requirements-mac.txt
-        python -m pip install -r requirements-dev.txt 
+        python -m pip install pytest wheel
+        python -m pip install -r requirements.txt -r requirements-mac.txt -r requirements-dev.txt
     - name: Make OneFile
       run: |
-        pyinstaller --add-data "*.mp3:." --onefile vaccine-run-kakao.py
-        chmod +x dist/vaccine-run-kakao
+        python -m nuitka --assume-yes-for-downloads --include-data-file="./*.mp3=./" --onefile --lto -o vaccine-run-kakao vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
           name: Mac-Binary
-          path: dist/vaccine-run-kakao
+          path: vaccine-run-kakao

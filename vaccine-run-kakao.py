@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3.9 -m nuitka
 # -*- coding: utf-8 -*-
 import browser_cookie3
 import requests
