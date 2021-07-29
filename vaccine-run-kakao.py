@@ -10,7 +10,7 @@ import time
 import http.cookiejar
 from playsound import playsound
 from datetime import datetime
-
+import telepot
 import urllib3
 
 search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
@@ -149,8 +149,10 @@ def play_xylophon():
 def close(success=False):
     if success: 
         play_tada()
+        send_msg("잔여백신 예약 성공!! \n 카카오톡지갑을 확인하세요.")
     else:
         play_xylophon()
+        send_msg("오류와 함께 잔여백신 예약 프로그램이 종료되었습니다.")
     input("Press Enter to close...")
     sys.exit()
 
@@ -343,7 +345,20 @@ def main_function():
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
     find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
     close()
-
+    
+def send_msg(msg):
+    config_parser = configparser.ConfigParser()
+    if os.path.exists('telegram.txt'):
+        try:
+            config_parser.read('telegram.txt')
+            print("Telegram으로 결과를 전송합니다.")
+            tgtoken = config_parser["telegram"]["token"]
+            tgid = config_parser["telegram"]["chatid"]
+            bot = telepot.Bot(tgtoken)
+            bot.sendMessage(tgid, msg)
+            return
+        except:
+            return
 
 # ===================================== run ===================================== #
 if __name__ == '__main__':
