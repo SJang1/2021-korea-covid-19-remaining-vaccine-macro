@@ -1,0 +1,18 @@
+name: VirusTotal scan after released
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  virustotal:
+    runs-on: ubuntu-latest
+    if: ${{ false }} # Remove this line only after add `VT_API_KEY` on secret env.
+    steps:
+    - name: VirusTotal Scan
+      uses: crazy-max/ghaction-virustotal@v2
+      with:
+        vt_api_key: ${{ secrets.VT_API_KEY }}
+        update_release_body: true
+        files: |
+          .exe$

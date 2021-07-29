@@ -94,12 +94,3 @@ jobs:
         files: |
           artifacts/vaccine-run-kakao-windows.exe
           artifacts/vaccine-run-kakao-mac.tar
-      
-    - name: VirusTotal Scan
-      if: ${{ false }} # Remove this line only after add `VT_API_KEY` on secret env.
-      uses: crazy-max/ghaction-virustotal@v2
-      with:
-        vt_api_key: ${{ secrets.VT_API_KEY }}
-        update_release_body: true
-        files: |
-          artifacts/vaccine-run-kakao-windows.exe
