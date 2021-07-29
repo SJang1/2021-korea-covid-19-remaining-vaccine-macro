@@ -91,6 +91,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
+        body: "Released via Github Actions"
         files: |
           artifacts/vaccine-run-kakao-windows.exe
           artifacts/vaccine-run-kakao-mac.tar
