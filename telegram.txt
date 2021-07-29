@@ -1,0 +1,3 @@
+[telegram]
+token = 토큰값
+chatid = 채팅방ID
