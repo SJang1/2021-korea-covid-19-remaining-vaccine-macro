@@ -59,8 +59,10 @@ jobs:
     - name: Make OneFile
       run: |
         python -m nuitka --assume-yes-for-downloads --include-data-file="./*.mp3=./" --onefile --lto -o vaccine-run-kakao vaccine-run-kakao.py
+    - name: Tar file
+      run: tar -cvf vaccine-run-kakao.tar vaccine-run-kakao
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
           name: Mac-Binary
-          path: vaccine-run-kakao
+          path: vaccine-run-kakao.tar
