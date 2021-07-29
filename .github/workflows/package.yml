@@ -68,3 +68,36 @@ jobs:
       with:
           name: Mac-Binary
           path: dist/vaccine-run-kakao.tar
+
+  publish:
+    name: Release
+    permissions:
+      contents: write
+    needs: [Windows-Build, MacOS-Build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download archived package
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+
+    - name: Rename file name for release
+      run: |
+        mv artifacts/Windows-Binary/vaccine-run-kakao.exe artifacts/vaccine-run-kakao-windows.exe
+        mv artifacts/Mac-Binary/vaccine-run-kakao.tar artifacts/vaccine-run-kakao-mac.tar
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          artifacts/vaccine-run-kakao-windows.exe
+          artifacts/vaccine-run-kakao-mac.tar
+      
+    - name: VirusTotal Scan
+      if: ${{ false }} # Remove this line only after add `VT_API_KEY` on secret env.
+      with:
+        vt_api_key: ${{ secrets.VT_API_KEY }}
+        files: |
+          artifacts/vaccine-run-kakao-windows.exe
