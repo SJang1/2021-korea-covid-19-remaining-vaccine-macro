@@ -415,7 +415,7 @@ def main_function():
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
     find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-    close(success=None)
+    close()
 
 
 def send_msg(msg):
