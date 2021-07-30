@@ -17,7 +17,26 @@ import re
 search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
 urllib3.disable_warnings()
 
-jar = browser_cookie3.chrome(domain_name=".kakao.com")
+# FIXME: jar 좀 어떻게 해서 깔끔하게 하기. 아래에 지정하면  `not defined` 표시.
+# [chrome][cookie_file] 에서 경로를 로드함.
+def load_cookie_config():
+    config_parser = configparser.ConfigParser()
+    if os.path.exists('config.ini'):
+        try:
+            config_parser.read('config.ini')
+            cookie_file = os.path.abspath(config_parser['chrome']['cookie_file'])
+            if os.path.exists(cookie_file):
+                return cookie_file
+            else:
+                print("쿠키 파일이 존재하지 않습니다. 기본값으로 시도합니다.")
+                return None
+        except Exception: # 정확한 오류를 몰라서 전부 Exception
+            print("쿠키 파일을 찾는데 실패했습니다. 기본값으로 시도합니다.")
+            return None
+    return None
+
+
+jar = browser_cookie3.chrome(cookie_file=load_cookie_config(), domain_name=".kakao.com")
 
 
 # 기존 입력 값 로딩
