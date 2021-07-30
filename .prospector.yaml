@@ -4,3 +4,13 @@ ignore-patterns:
   - ^vaccine-run-naver\.py$ # Ignore naver
 
 autodetect: false
+
+pylint:
+  disable:
+    # Disable no-else series due to incorrect detection.
+    - no-else-break
+    - no-else-return
+    - no-else-raise
+
+mccabe:
+  run: false
