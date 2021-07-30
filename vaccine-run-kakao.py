@@ -97,6 +97,19 @@ def fill_str_with_space(input_s, max_size=40, fill_char=" "):
     return input_s + fill_char * (max_size - length)
 
 
+def is_in_range(coord_type, coord, min_x=124.965323, max_x = 130.416515, max_y=38.634065, min_y = 34.082053):
+    try:
+        if coord_type == "x":
+            return min_x <= float(coord) <= max_x
+        elif coord_type == "y":
+            return min_y <= float(coord) <= max_y
+        else:
+            return False
+    except ValueError:
+        # float 이외 값 입력 방지
+        return False
+
+
 def input_config():
     vaccine_candidates = [
         {"name": "아무거나", "code": "ANY"},
@@ -152,18 +165,30 @@ def input_config():
     top_x = None
     while top_x is None:
         top_x = input("사각형의 위쪽 좌측 x값을 넣어주세요. 127.xxxxxx: ").strip()
+        if not is_in_range(coord_type="x", coord=top_x):
+            print(f"올바른 좌표 값이 아닙니다. 입력 값 : {top_x}")
+            top_x = None
 
     top_y = None
     while top_y is None:
         top_y = input("사각형의 위쪽 좌측 y값을 넣어주세요 37.xxxxxx: ").strip()
+        if not is_in_range(coord_type="y", coord=top_y):
+            print(f"올바른 좌표 값이 아닙니다. 입력 값 : {top_y}")
+            top_y = None
 
     bottom_x = None
     while bottom_x is None:
         bottom_x = input("사각형의 아래쪽 우측 x값을 넣어주세요 127.xxxxxx: ").strip()
+        if not is_in_range(coord_type="x", coord=bottom_x, min_x=float(top_x)):
+            print(f"올바른 좌표 값이 아닙니다. 입력 값 : {bottom_x}")
+            bottom_x = None
 
     bottom_y = None
     while bottom_y is None:
         bottom_y = input("사각형의 아래쪽 우측 y값을 넣어주세요 37.xxxxxx: ").strip()
+        if not is_in_range(coord_type="y", coord=bottom_y, max_y=float(top_y)):
+            print(f"올바른 좌표 값이 아닙니다. 입력 값 : {bottom_y}")
+            bottom_y = None
 
     dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y)
     return vaccine_type, top_x, top_y, bottom_x, bottom_y
