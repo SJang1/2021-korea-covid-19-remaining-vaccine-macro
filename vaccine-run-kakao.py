@@ -137,6 +137,7 @@ def input_config():
                         continue
                     else:
                         print("Y 또는 N을 입력해 주세요.")
+                        continue
 
             if vaccine["name"] == "(미사용)":
                 print("현재 프로그램 버전에서 백신 이름이 등록되지 않은, 추후를 위해 미리 넣어둔 백신 코드입니다.\n" +
