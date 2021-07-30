@@ -21,9 +21,9 @@ urllib3.disable_warnings()
 # [chrome][cookie_file] 에서 경로를 로드함.
 def load_cookie_config():
     config_parser = configparser.ConfigParser(interpolation=None)
-    if os.path.exists('config.ini'):
+    if os.path.exists('cookie.ini'):
         try:
-            config_parser.read('config.ini')
+            config_parser.read('cookie.ini')
             cookie_path = config_parser['chrome']['cookie_file']
 
             if cookie_path[0] == '~':
