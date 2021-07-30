@@ -88,13 +88,13 @@ def fill_str_with_space(input_s, max_size=40, fill_char=" "):
     - 최대 길이(max_size)는 40이며, input_s의 실제 길이가 이보다 짧으면
     남은 문자를 fill_char로 채운다.
     """
-    l = 0
+    length = 0
     for c in input_s:
         if unicodedata.east_asian_width(c) in ["F", "W"]:
-            l += 2
+            length += 2
         else:
-            l += 1
-    return input_s + fill_char * (max_size - l)
+            length += 1
+    return input_s + fill_char * (max_size - length)
 
 
 
@@ -127,20 +127,19 @@ def input_config():
     print("사각형 모양으로 백신범위를 지정한 뒤, 해당 범위 안에 있는 백신을 조회해서 남은 백신이 있으면 Chrome 브라우저를 엽니다.")
     top_x = None
     while top_x is None:
-        top_x = input(f"사각형의 위쪽 좌측 x값을 넣어주세요. 127.xxxxxx: ").strip()
+        top_x = input("사각형의 위쪽 좌측 x값을 넣어주세요. 127.xxxxxx: ").strip()
 
     top_y = None
     while top_y is None:
-        top_y = input(f"사각형의 위쪽 좌측 y값을 넣어주세요 37.xxxxxx: ").strip()
-        top_y = top_y
+        top_y = input("사각형의 위쪽 좌측 y값을 넣어주세요 37.xxxxxx: ").strip()
 
     bottom_x = None
     while bottom_x is None:
-        bottom_x = input(f"사각형의 아래쪽 우측 x값을 넣어주세요 127.xxxxxx: ").strip()
+        bottom_x = input("사각형의 아래쪽 우측 x값을 넣어주세요 127.xxxxxx: ").strip()
 
     bottom_y = None
     while bottom_y is None:
-        bottom_y = input(f"사각형의 아래쪽 우측 y값을 넣어주세요 37.xxxxxx: ").strip()
+        bottom_y = input("사각형의 아래쪽 우측 y값을 넣어주세요 37.xxxxxx: ").strip()
 
     dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y)
     return vaccine_type, top_x, top_y, bottom_x, bottom_y
@@ -244,13 +243,14 @@ def try_reservation(organization_code, vaccine_type):
             print("백신접종신청 성공!!!")
             organization_code_success = response_json.get("organization")
             print(
-                f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}")
+                f"병원이름: {organization_code_success.get('orgName')}\t" +
+                f"전화번호: {organization_code_success.get('phoneNumber')}\t" +
+                f"주소: {organization_code_success.get('address')}")
             close(success=True)
         else:
             print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
             print(response.text)
             close()
-    return None
 
 def retry_reservation(organization_code, vaccine_type):
     reservation_url = 'https://vaccine.kakao.com/api/v1/reservation/retry'
@@ -269,13 +269,14 @@ def retry_reservation(organization_code, vaccine_type):
             print("백신접종신청 성공!!!")
             organization_code_success = response_json.get("organization")
             print(
-                f"병원이름: {organization_code_success.get('orgName')}\t전화번호: {organization_code_success.get('phoneNumber')}\t주소: {organization_code_success.get('address')}")
+                f"병원이름: {organization_code_success.get('orgName')}\t" + 
+                f"전화번호: {organization_code_success.get('phoneNumber')}\t" +
+                f"주소: {organization_code_success.get('address')}")
             close(success=True)
         else:
             print("ERROR. 아래 메시지를 보고, 예약이 신청된 병원 또는 1339에 예약이 되었는지 확인해보세요.")
             print(response.text)
             close()
-    return None
 
 # ===================================== def ===================================== #
 
@@ -289,7 +290,7 @@ def retry_reservation(organization_code, vaccine_type):
 #     driver.add_cookie(cookie)
 #     print(cookie)
 
-
+# pylint: disable=too-many-locals,too-many-statements,too-many-branches
 def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     url = 'https://vaccine-map.kakao.com/api/v2/vaccine/left_count_by_coords'
     data = {"bottomRight": {"x": bottom_x, "y": bottom_y}, "onlyLeft": False, "order": "latitude",
@@ -322,16 +323,16 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
             print("Timeout Error : ", timeouterror)
             #close()
 
+        except requests.exceptions.SSLError as sslerror:
+            print("SSL Error : ", sslerror)
+            close()
+
         except requests.exceptions.ConnectionError as connectionerror:
             print("Connecting Error : ", connectionerror)
             close()
 
         except requests.exceptions.HTTPError as httperror:
             print("Http Error : ", httperror)
-            close()
-
-        except requests.exceptions.SSLError as sslerror:
-            print("SSL Error : ", sslerror)
             close()
 
         except requests.exceptions.RequestException as error:
@@ -392,8 +393,10 @@ def send_msg(msg):
             bot = telepot.Bot(tgtoken)
             bot.sendMessage(tgid, msg)
             return
-        except:
+        except Exception as e:
+            print("Telegram Error : ", e)
             return
+
 
 # ===================================== run ===================================== #
 if __name__ == '__main__':
