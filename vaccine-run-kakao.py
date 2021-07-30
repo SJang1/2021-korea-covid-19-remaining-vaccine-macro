@@ -97,7 +97,7 @@ def fill_str_with_space(input_s, max_size=40, fill_char=" "):
     return input_s + fill_char * (max_size - length)
 
 
-def is_in_range(coord_type, coord, min_x=124.965323, max_x = 130.416515, max_y=38.634065, min_y = 34.082053):
+def is_in_range(coord_type, coord, min_x=124.965323, max_x = 130.416515, min_y = 34.082053, max_y=38.634065):
     try:
         if coord_type == "x":
             return min_x <= float(coord) <= max_x
