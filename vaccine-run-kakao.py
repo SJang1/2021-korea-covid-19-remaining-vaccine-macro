@@ -41,7 +41,6 @@ def load_cookie_config():
                 print("쿠키 파일이 존재하지 않습니다. 기본값으로 시도합니다.")
                 return None
         except Exception: # 정확한 오류를 몰라서 전부 Exception
-            print("쿠키 파일을 찾는데 실패했습니다. 기본값으로 시도합니다.")
             return None
     return None
 
