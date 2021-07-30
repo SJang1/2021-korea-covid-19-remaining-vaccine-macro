@@ -23,6 +23,9 @@ jobs:
         path: |
           ~\AppData\Local\pip\Cache
           ~\AppData\Local\Nuitka\Nuitka
+          vaccine-run-kakao.build
+          vaccine-run-kakao.dist
+          vaccine-run-kakao.onefile-build
         # An explicit key for restoring and saving the cache
         key: ${{ runner.os }}-cache-${{ hashFiles('requirements.txt') }}
         restore-keys: |
