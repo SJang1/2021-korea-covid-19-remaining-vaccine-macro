@@ -23,7 +23,7 @@ jobs:
         path: |
           ~/AppData\Local\Nuitka\Nuitka
         # An explicit key for restoring and saving the cache
-        key: ${{ runner.os }}-cache-${{ hashFiles('*.py') }}
+        key: ${{ runner.os }}-cache-${{ hashFiles('requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-cache-
     - name: Set up Python ${{ matrix.python-version }}
