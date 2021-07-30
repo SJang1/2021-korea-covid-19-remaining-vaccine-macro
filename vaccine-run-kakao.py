@@ -20,17 +20,25 @@ urllib3.disable_warnings()
 # FIXME: jar 좀 어떻게 해서 깔끔하게 하기. 아래에 지정하면  `not defined` 표시.
 # [chrome][cookie_file] 에서 경로를 로드함.
 def load_cookie_config():
-    config_parser = configparser.ConfigParser()
+    config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('config.ini'):
         try:
             config_parser.read('config.ini')
-            cookie_file = os.path.abspath(config_parser['chrome']['cookie_file'])
+            cookie_path = config_parser['chrome']['cookie_file']
+            if cookie_path[0] == '~':
+                cookie_file = os.path.expanduser(cookie_path)
+            elif "%" in cookie_path or "$" in cookie_path:
+                cookie_file = os.path.expandvars(cookie_path)
+            else:
+                cookie_file = cookie_path
+            cookie_file = os.path.abspath(cookie_file)
+            print(cookie_file)
             if os.path.exists(cookie_file):
                 return cookie_file
             else:
                 print("쿠키 파일이 존재하지 않습니다. 기본값으로 시도합니다.")
                 return None
-        except Exception: # 정확한 오류를 몰라서 전부 Exception
+        except Exception as e: # 정확한 오류를 몰라서 전부 Exception
             print("쿠키 파일을 찾는데 실패했습니다. 기본값으로 시도합니다.")
             return None
     return None
