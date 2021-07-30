@@ -11,6 +11,7 @@ import http.cookiejar
 from playsound import playsound
 from datetime import datetime
 import telepot
+import unicodedata
 import urllib3
 
 search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
@@ -81,19 +82,39 @@ def check_user_info_loaded():
                 close()
 
 
+def fill_str_with_space(input_s, max_size=40, fill_char=" "):
+    """
+    - 길이가 긴 문자는 2칸으로 체크하고, 짧으면 1칸으로 체크함.
+    - 최대 길이(max_size)는 40이며, input_s의 실제 길이가 이보다 짧으면
+    남은 문자를 fill_char로 채운다.
+    """
+    l = 0
+    for c in input_s:
+        if unicodedata.east_asian_width(c) in ["F", "W"]:
+            l += 2
+        else:
+            l += 1
+    return input_s + fill_char * (max_size - l)
+
+
+
 def input_config():
     vaccine_candidates = [
         {"name": "화이자", "code": "VEN00013"},
         {"name": "모더나", "code": "VEN00014"},
         {"name": "아스트라제네카", "code": "VEN00015"},
         {"name": "얀센", "code": "VEN00016"},
+        {"name": "(미사용)", "code": "VEN00017"},
+        {"name": "(미사용)", "code": "VEN00018"},
+        {"name": "(미사용)", "code": "VEN00019"},
+        {"name": "(미사용)", "code": "VEN00020"},
         {"name": "아무거나", "code": "ANY"},
     ]
     vaccine_type = None
     while True:
         print("=== 백신 목록 ===")
         for vaccine in vaccine_candidates:
-            print(f"{vaccine['name']:10} : {vaccine['code']}")
+            print(f"{fill_str_with_space(vaccine['name'], 10)} : {vaccine['code']}")
 
         vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요: "))
         if any(x["code"] == vaccine_type for x in vaccine_candidates):
