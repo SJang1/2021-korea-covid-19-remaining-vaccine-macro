@@ -79,7 +79,7 @@ def check_user_info_loaded():
                 close()
             else:
                 print("이미 접종이 완료되었거나 예약이 완료된 사용자입니다.")
-                close()
+                close(success=None)
 
 
 def fill_str_with_space(input_s, max_size=40, fill_char=" "):
@@ -206,12 +206,14 @@ def play_xylophon():
 
 
 def close(success=False):
-    if success:
+    if success is True:
         play_tada()
         send_msg("잔여백신 예약 성공!! \n 카카오톡지갑을 확인하세요.")
-    else:
+    elif success is False:
         play_xylophon()
         send_msg("오류와 함께 잔여백신 예약 프로그램이 종료되었습니다.")
+    else:
+        pass
     input("Press Enter to close...")
     sys.exit()
 
@@ -413,7 +415,7 @@ def main_function():
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
     find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-    close()
+    close(success=None)
 
 
 def send_msg(msg):
