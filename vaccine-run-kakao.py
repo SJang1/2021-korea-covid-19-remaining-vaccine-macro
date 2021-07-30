@@ -198,11 +198,11 @@ def resource_path(relative_path):
 
 
 def play_tada():
-    playsound(resource_path('tada.mp3'), block=False)
+    playsound(resource_path('tada.mp3'))
 
 
 def play_xylophon():
-    playsound(resource_path('xylophon.mp3'), block=False)
+    playsound(resource_path('xylophon.mp3'))
 
 
 def close(success=False):
