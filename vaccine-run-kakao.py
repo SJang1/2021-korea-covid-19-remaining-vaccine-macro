@@ -114,6 +114,8 @@ def input_config():
     while True:
         print("=== 백신 목록 ===")
         for vaccine in vaccine_candidates:
+            if vaccine["name"] == "(미사용)":
+                continue
             print(f"{fill_str_with_space(vaccine['name'], 10)} : {vaccine['code']}")
 
         vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요: "))
