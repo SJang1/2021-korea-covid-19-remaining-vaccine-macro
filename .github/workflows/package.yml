@@ -24,9 +24,9 @@ jobs:
           c:\hostedtoolcache
           ~/AppData\Local\Nuitka\Nuitka
         # An explicit key for restoring and saving the cache
-        key: ${{ runner.os }}-build-cache
+        key: ${{ runner.os }}-cache-${{ hashFiles('*.py') }}
         restore-keys: |
-          ${{ runner.os }}-build-cache
+          ${{ runner.os }}-cache-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
