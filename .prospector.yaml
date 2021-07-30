@@ -1,0 +1,6 @@
+strictness: medium
+
+ignore-patterns:
+  - ^vaccine-run-naver\.py$ # Ignore naver
+
+autodetect: false

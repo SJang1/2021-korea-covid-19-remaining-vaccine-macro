@@ -1,0 +1,17 @@
+name: Lint python
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest wheel prospector
+
+    - name: Lint via prospector
+      run: python -m prospector
