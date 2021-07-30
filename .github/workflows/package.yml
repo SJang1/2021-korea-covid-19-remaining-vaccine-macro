@@ -40,7 +40,7 @@ jobs:
 
     - name: Make OneFile
       run: |
-        nuitka --assume-yes-for-downloads --verbose --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
+        nuitka --assume-yes-for-downloads --show-scons --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
@@ -78,3 +78,30 @@ jobs:
       with:
           name: Mac-Binary
           path: dist/vaccine-run-kakao.tar
+
+  publish:
+    name: Release
+    permissions:
+      contents: write
+    needs: [Windows-Build, MacOS-Build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download archived package
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+
+    - name: Rename file name for release
+      run: |
+        mv artifacts/Windows-Binary/vaccine-run-kakao.exe artifacts/vaccine-run-kakao-windows.exe
+        mv artifacts/Mac-Binary/vaccine-run-kakao.tar artifacts/vaccine-run-kakao-mac.tar
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body: "Released via Github Actions"
+        files: |
+          artifacts/vaccine-run-kakao-windows.exe
+          artifacts/vaccine-run-kakao-mac.tar
