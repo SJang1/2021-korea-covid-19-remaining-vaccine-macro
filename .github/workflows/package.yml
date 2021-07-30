@@ -16,6 +16,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        # A list of files, directories, and wildcard patterns to cache and restore
+        path: |
+          ~\AppData\Local\pip\Cache
+          ~\AppData\Local\Nuitka\Nuitka
+          vaccine-run-kakao.build
+          vaccine-run-kakao.dist
+          vaccine-run-kakao.onefile-build
+        # An explicit key for restoring and saving the cache
+        key: ${{ runner.os }}-cache-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cache-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -30,7 +44,7 @@ jobs:
 
     - name: Make OneFile
       run: |
-        nuitka --assume-yes-for-downloads --verbose --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
+        nuitka --assume-yes-for-downloads --show-scons --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
