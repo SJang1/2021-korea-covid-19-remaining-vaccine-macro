@@ -91,7 +91,7 @@ def input_config():
     ]
     vaccine_type = None
     while True:
-        print("예약시도할 백신 코드를 알려주세요.")
+        print("=== 백신 목록 ===")
         for vaccine in vaccine_candidates:
             print(f"{vaccine['name']:10} : {vaccine['code']}")
 
