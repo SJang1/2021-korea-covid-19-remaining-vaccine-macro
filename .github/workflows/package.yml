@@ -21,7 +21,8 @@ jobs:
       with:
         # A list of files, directories, and wildcard patterns to cache and restore
         path: |
-          ~/AppData\Local\Nuitka\Nuitka
+          ~\AppData\Local\pip\Cache
+          ~\AppData\Local\Nuitka\Nuitka
         # An explicit key for restoring and saving the cache
         key: ${{ runner.os }}-cache-${{ hashFiles('requirements.txt') }}
         restore-keys: |
