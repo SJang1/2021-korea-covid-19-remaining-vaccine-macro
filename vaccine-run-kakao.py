@@ -122,10 +122,21 @@ def input_config():
         if any(x["code"] == vaccine_type for x in vaccine_candidates) or vaccine_type.startswith("FORCE:"):
             if vaccine_type.startswith("FORCE:"):
                 vaccine_type = vaccine_type[6:].strip()
+
                 print("경고: 강제 코드 입력모드를 사용하셨습니다.\n" +
                       "이 모드는 새로운 백신이 예약된 코드로 **등록되지 않은 경우에만** 사용해야 합니다.\n" +
                       "입력하신 코드가 정상적으로 작동하는 백신 코드인지 필히 확인해주세요.\n" +
                      f"현재 코드: '{vaccine_type}'\n")
+
+                if (len(vaccine_type) != 8 or not vaccine_type.startswith("VEN")):
+                    print("입력하신 코드가 현재 알려진 백신 코드 형식이랑 맞지 않습니다.")
+                    proceed = str.lower(input("진행하시겠습니까? Y/N : "))
+                    if proceed == "y":
+                        pass
+                    elif proceed == "n":
+                        continue
+                    else:
+                        print("Y 또는 N을 입력해 주세요.")
 
             if vaccine["name"] == "(미사용)":
                 print("현재 프로그램 버전에서 백신 이름이 등록되지 않은, 추후를 위해 미리 넣어둔 백신 코드입니다.\n" +
