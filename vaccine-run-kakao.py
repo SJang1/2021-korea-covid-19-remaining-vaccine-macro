@@ -82,15 +82,19 @@ def check_user_info_loaded():
 
 
 def input_config():
+    vaccine_list = ("ANY", "VEN00013", "VEN00014", "VEN00015", "VEN00016")     
     vaccine_type = None
     while vaccine_type is None:
         print("예약시도할 백신 코드를 알려주세요.")
-        print("화이자         : VEN00013")
-        print("모더나         : VEN00014")
-        print("아스트라제네카   : VEN00015")
-        print("얀센          : VEN00016")
-        print("아무거나       : ANY")
-        vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요."))
+        print("화이자         : 1")
+        print("모더나         : 2")
+        print("아스트라제네카 : 3")
+        print("얀센           : 4")
+        print("아무거나       : 0")
+        try: vaccine_code = int(input("예약시도할 백신 코드를 알려주세요 : "))
+        except ValueError: continue
+        except IndexError: continue
+        vaccine_type = vaccine_list[vaccine_code]
 
     print("사각형 모양으로 백신범위를 지정한 뒤, 해당 범위 안에 있는 백신을 조회해서 남은 백신이 있으면 Chrome 브라우저를 엽니다.")
     top_x = None
