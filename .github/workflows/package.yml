@@ -21,7 +21,6 @@ jobs:
       with:
         # A list of files, directories, and wildcard patterns to cache and restore
         path: |
-          c:\hostedtoolcache
           ~/AppData\Local\Nuitka\Nuitka
         # An explicit key for restoring and saving the cache
         key: ${{ runner.os }}-cache-${{ hashFiles('*.py') }}
