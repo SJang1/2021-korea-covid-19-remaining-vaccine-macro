@@ -66,7 +66,7 @@ def load_cookie_config():
             elif "%" in cookie_file or "$" in cookie_file:
                 cookie_path = os.path.expandvars(cookie_file)
             else:
-                cookie_path = cookie_path
+                cookie_path = cookie_file
 
             cookie_path = os.path.abspath(cookie_path)
 
