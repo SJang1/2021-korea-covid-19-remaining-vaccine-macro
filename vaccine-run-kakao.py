@@ -17,36 +17,8 @@ import re
 search_time = 0.2  # 잔여백신을 해당 시간마다 한번씩 검색합니다. 단위: 초
 urllib3.disable_warnings()
 
-# FIXME: jar 좀 어떻게 해서 깔끔하게 하기. 아래에 지정하면  `not defined` 표시.
-# [chrome][cookie_file] 에서 경로를 로드함.
-def load_cookie_config():
-    config_parser = configparser.ConfigParser(interpolation=None)
-    if os.path.exists('cookie.ini'):
-        try:
-            config_parser.read('cookie.ini')
-            cookie_path = config_parser['chrome']['cookie_file']
-
-            if cookie_path[0] == '~':
-                cookie_file = os.path.expanduser(cookie_path)
-            elif "%" in cookie_path or "$" in cookie_path:
-                cookie_file = os.path.expandvars(cookie_path)
-            else:
-                cookie_file = cookie_path
-
-            cookie_file = os.path.abspath(cookie_file)
-
-            if os.path.exists(cookie_file):
-                return cookie_file
-            else:
-                print("쿠키 파일이 존재하지 않습니다. 기본값으로 시도합니다.")
-                return None
-        except Exception: # 정확한 오류를 몰라서 전부 Exception
-            return None
-    return None
-
-
-jar = browser_cookie3.chrome(cookie_file=load_cookie_config(), domain_name=".kakao.com")
-
+# 아래의 `load_cookie()` 에서 쿠키를 불러옴.
+jar=None
 
 # 기존 입력 값 로딩
 def load_config():
@@ -81,6 +53,36 @@ def load_config():
             return None, None, None, None, None
     return None, None, None, None, None
 
+# cookie.ini 안의 [chrome][cookie_file] 에서 경로를 로드함.
+def load_cookie_config():
+    config_parser = configparser.ConfigParser(interpolation=None)
+    if os.path.exists('cookie.ini'):
+        try:
+            config_parser.read('cookie.ini')
+            cookie_file = config_parser['chrome']['cookie_file']
+
+            if cookie_file[0] == '~':
+                cookie_path = os.path.expanduser(cookie_file)
+            elif "%" in cookie_file or "$" in cookie_file:
+                cookie_path = os.path.expandvars(cookie_file)
+            else:
+                cookie_path = cookie_path
+
+            cookie_path = os.path.abspath(cookie_path)
+
+            if os.path.exists(cookie_path):
+                return cookie_path
+            else:
+                print("지정된 경로에 쿠키 파일이 존재하지 않습니다. 기본값으로 시도합니다.")
+                return None
+        except Exception: # 정확한 오류를 몰라서 전부 Exception
+            return None
+    return None
+
+# 쿠키를 global jar 함수에 로드함.
+def load_cookie():
+    global jar
+    jar = browser_cookie3.chrome(cookie_file=load_cookie_config(), domain_name=".kakao.com")
 
 def check_user_info_loaded():
     user_info_api = 'https://vaccine.kakao.com/api/v1/user'
@@ -467,6 +469,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
 
 def main_function():
+    load_cookie()
     check_user_info_loaded()
     previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     if previous_used_type is None:
