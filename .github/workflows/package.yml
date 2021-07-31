@@ -84,7 +84,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{ runner.os }}-cache-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt', 'requirements-mac.txt', 'requirements-dev.txt') }
+        key: ${{ runner.os }}-cache-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt', 'requirements-mac.txt', 'requirements-dev.txt') }}
         restore-key: |
           ${{ runner.os }}-cache-
     - name: Install dependencies
