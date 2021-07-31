@@ -64,7 +64,7 @@ def load_cookie_config():
             indicator = cookie_file[0]
             if indicator == '~':
                 cookie_path = os.path.expanduser(cookie_file)
-            elif indicator == "%" or indicator == "$":
+            elif indicator in ('%', '$'):
                 cookie_path = os.path.expandvars(cookie_file)
             else:
                 cookie_path = cookie_file
