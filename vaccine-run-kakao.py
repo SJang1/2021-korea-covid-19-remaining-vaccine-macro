@@ -59,11 +59,12 @@ def load_cookie_config():
     if os.path.exists('cookie.ini'):
         try:
             config_parser.read('cookie.ini')
-            cookie_file = config_parser['chrome']['cookie_file']
-
-            if cookie_file[0] == '~':
+            cookie_file = config_parser['chrome']['cookie_file'].strip()
+            
+            indicator = cookie_file[0]
+            if indicator == '~':
                 cookie_path = os.path.expanduser(cookie_file)
-            elif "%" in cookie_file or "$" in cookie_file:
+            elif indicator == "%" or indicator == "$":
                 cookie_path = os.path.expandvars(cookie_file)
             else:
                 cookie_path = cookie_file
