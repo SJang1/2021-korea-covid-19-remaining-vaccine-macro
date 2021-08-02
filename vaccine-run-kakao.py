@@ -61,7 +61,7 @@ def load_cookie_config():
     config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('cookie.ini'):
         config_parser.read('cookie.ini')
-        
+
         kawlt = config_parser.get('cookie', 'kawlt', fallback=None)
         if kawlt is not None:
             print("수동 입력된 쿠키 값으로 시도합니다.")
@@ -71,7 +71,8 @@ def load_cookie_config():
             return False
 
         try:
-            cookie_file = config_parser.get('chrome', 'cookie_file', fallback=None)
+            cookie_file = config_parser.get(
+                'chrome', 'cookie_file', fallback=None)
             if cookie_file is None:
                 return None
 
@@ -141,7 +142,8 @@ def load_search_time():
     config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('cookie.ini'):
         config_parser.read('cookie.ini')
-        input_time = config_parser.getfloat('config', 'search_time', fallback=0.2)
+        input_time = config_parser.getfloat(
+            'config', 'search_time', fallback=0.2)
 
         if input_time < 0.2:
             search_time = 0.2
