@@ -1,4 +1,7 @@
-# korea-covid-19-remaining-vaccine-macro [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FSJang1%2Fkorea-covid-19-remaining-vaccine-macro&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=README_HITS&edge_flat=false)](https://hits.seeyoufarm.com) [![Python package](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/package.yml/badge.svg)](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/package.yml) [![CodeQL](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/codeql-analysis.yml)
+# korea-covid-19-remaining-vaccine-macro
+
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FSJang1%2Fkorea-covid-19-remaining-vaccine-macro&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=README_HITS&edge_flat=false)](https://hits.seeyoufarm.com) [![Python package](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/package.yml/badge.svg)](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/package.yml) [![CodeQL](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/actions/workflows/codeql-analysis.yml)
+
 잔여백신 지도 API로 남은 백신 수를 확인하고, 잔여백신이 있는 경우 잔여백신 예약 페이지로 이동합니다.
 
 ### 자세한 내용은 [공지사항](https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/discussions/468)을 참고하세요.
