@@ -310,6 +310,7 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     conf["topY"] = top_y
     conf["botX"] = bottom_x
     conf["botY"] = bottom_y
+    conf["search_time"] = search_time
 
     with open("config.ini", "w") as config_file:
         config_parser.write(config_file)
