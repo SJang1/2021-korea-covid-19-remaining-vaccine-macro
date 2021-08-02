@@ -434,21 +434,22 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
             response = requests.post(url, data=json.dumps(
                 data), headers=Headers.headers_map, verify=False, timeout=5)
 
-            json_data = json.loads(response.text)
+            try:
+                json_data = json.loads(response.text)
+                pretty_print(json_data)
+                print(datetime.now())
 
-            pretty_print(json_data)
-            print(datetime.now())
+                for x in json_data.get("organizations"):
+                    if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
+                        found = x
+                        done = True
+                        break
 
-            for x in json_data.get("organizations"):
-                if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
-                    found = x
-                    done = True
-                    break
+            except json.decoder.JSONDecodeError as decodeerror:
+                print("JSONDecodeError : ", decodeerror)
+                print("JSON string : ", response.text)
+                close()
 
-        except json.decoder.JSONDecodeError as decodeerror:
-            print("JSONDecodeError : ", decodeerror)
-            print("JSON string : ", response.text)
-            close()
 
         except requests.exceptions.Timeout as timeouterror:
             print("Timeout Error : ", timeouterror)
