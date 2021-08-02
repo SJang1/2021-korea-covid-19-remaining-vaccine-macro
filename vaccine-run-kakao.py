@@ -58,6 +58,8 @@ def load_config():
 
 # cookie.ini 안의 [chrome][cookie_file] 에서 경로를 로드함.
 def load_cookie_config():
+    global jar
+
     config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('cookie.ini'):
         config_parser.read('cookie.ini')
@@ -105,7 +107,7 @@ def load_cookie():
     cookie_path = None
 
     if cookie_file is False:
-        return None
+        return
 
     if cookie_file is None:
         os_type = platform.system()
@@ -133,13 +135,12 @@ def load_cookie():
 
     jar = browser_cookie3.chrome(
         cookie_file=cookie_file, domain_name=".kakao.com")
-    return None
 
 
 def load_search_time():
     global search_time
 
-    config_parser = configparser.ConfigParser(interpolation=None)
+    config_parser = configparser.ConfigParser()
     if os.path.exists('cookie.ini'):
         config_parser.read('cookie.ini')
         input_time = config_parser.getfloat(
@@ -149,8 +150,6 @@ def load_search_time():
             search_time = 0.2
         else:
             search_time = input_time
-
-        return None
 
 
 def check_user_info_loaded():
