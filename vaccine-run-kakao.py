@@ -104,12 +104,11 @@ def load_cookie():
     global jar
 
     cookie_file = load_cookie_config()
-    cookie_path = None
-
     if cookie_file is False:
         return
 
     if cookie_file is None:
+        cookie_path = None
         os_type = platform.system()
         if os_type == "Linux":
             # browser_cookie3 also checks beta version of google chrome's cookie file.
