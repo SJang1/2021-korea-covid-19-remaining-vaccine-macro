@@ -60,9 +60,20 @@ def load_config():
 def load_cookie_config():
     config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('cookie.ini'):
+        config_parser.read('cookie.ini')
+        
+        kawlt = config_parser.get('cookie', 'kawlt', fallback=None)
+        if kawlt is not None:
+            print("수동 입력된 쿠키 값으로 시도합니다.")
+            jar = {
+                '_kawlt': kawlt.strip()
+            }
+            return False
+
         try:
-            config_parser.read('cookie.ini')
-            cookie_file = config_parser['chrome']['cookie_file'].strip()
+            cookie_file = config_parser.get('chrome', 'cookie_file', fallback=None)
+            if cookie_file is None:
+                return None
 
             indicator = cookie_file[0]
             if indicator == '~':
@@ -92,31 +103,52 @@ def load_cookie():
     cookie_file = load_cookie_config()
     cookie_path = None
 
-    os_type = platform.system()
-    if os_type == "Linux":
-        # browser_cookie3 also checks beta version of google chrome's cookie file.
-        cookie_path = os.path.expanduser(
-            "~/.config/google-chrome/Default/Cookies")
-        if os.path.exists(cookie_path) is False:
-            cookie_path = os.path.expanduser(
-                "~/.config/google-chrome-beta/Default/Cookies")
-    elif os_type == "Darwin":
-        cookie_path = os.path.expanduser(
-            "~/Library/Application Support/Google/Chrome/Default/Cookies")
-    elif os_type == "Windows":
-        cookie_path = os.path.expandvars(
-            "%LOCALAPPDATA%/Google/Chrome/User Data/Default/Cookies")
-    else:  # Jython?
-        print("지원하지 않는 환경입니다.")
-        close()
+    if cookie_file is False:
+        return None
 
-    if cookie_file is None and os.path.exists(cookie_path) is False:
-        print("기본 쿠키 파일 경로에 파일이 존재하지 않습니다. 아래 링크를 참조하여 쿠키 파일 경로를 지정해주세요.\n" +
-              "https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/discussions/403")
-        close()
+    if cookie_file is None:
+        os_type = platform.system()
+        if os_type == "Linux":
+            # browser_cookie3 also checks beta version of google chrome's cookie file.
+            cookie_path = os.path.expanduser(
+                "~/.config/google-chrome/Default/Cookies")
+            if os.path.exists(cookie_path) is False:
+                cookie_path = os.path.expanduser(
+                    "~/.config/google-chrome-beta/Default/Cookies")
+        elif os_type == "Darwin":
+            cookie_path = os.path.expanduser(
+                "~/Library/Application Support/Google/Chrome/Default/Cookies")
+        elif os_type == "Windows":
+            cookie_path = os.path.expandvars(
+                "%LOCALAPPDATA%/Google/Chrome/User Data/Default/Cookies")
+        else:  # Jython?
+            print("지원하지 않는 환경입니다.")
+            close()
+
+        if os.path.exists(cookie_path) is False:
+            print("기본 쿠키 파일 경로에 파일이 존재하지 않습니다. 아래 링크를 참조하여 쿠키 파일 경로를 지정해주세요.\n" +
+                  "https://github.com/SJang1/korea-covid-19-remaining-vaccine-macro/discussions/403")
+            close()
 
     jar = browser_cookie3.chrome(
         cookie_file=cookie_file, domain_name=".kakao.com")
+    return None
+
+
+def load_search_time():
+    global search_time
+
+    config_parser = configparser.ConfigParser(interpolation=None)
+    if os.path.exists('cookie.ini'):
+        config_parser.read('cookie.ini')
+        input_time = config_parser.getfloat('config', 'search_time', fallback=0.2)
+
+        if input_time < 0.2:
+            search_time = 0.2
+        else:
+            search_time = input_time
+
+        return None
 
 
 def check_user_info_loaded():
@@ -507,6 +539,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
 def main_function():
     load_cookie()
+    load_search_time()
     check_user_info_loaded()
     previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     if previous_used_type is None:
