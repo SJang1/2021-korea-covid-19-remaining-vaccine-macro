@@ -474,7 +474,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
     if found is None:
         find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-        return
+        return None
 
     print(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
     print(f"주소는 : {found.get('address')} 입니다.")
@@ -506,6 +506,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
         return None
     else:
         find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        return None
 
 
 def main_function():
