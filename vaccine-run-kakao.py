@@ -63,15 +63,6 @@ def load_cookie_config():
     config_parser = configparser.ConfigParser(interpolation=None)
     if os.path.exists('cookie.ini'):
         config_parser.read('cookie.ini')
-
-        kawlt = config_parser.get('cookie', 'kawlt', fallback=None)
-        if kawlt is not None:
-            print("수동 입력된 쿠키 값으로 시도합니다.")
-            jar = {
-                '_kawlt': kawlt.strip()
-            }
-            return False
-
         try:
             cookie_file = config_parser.get(
                 'chrome', 'cookie_file', fallback=None)
