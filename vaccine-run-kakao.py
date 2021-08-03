@@ -89,6 +89,7 @@ def load_cookie_config():
             return None
     return None
 
+
 def load_saved_cookie() -> bool:
     #  print('saved cookie loading')
     config_parser = configparser.ConfigParser(interpolation=None)
@@ -110,15 +111,17 @@ def load_saved_cookie() -> bool:
 
     return False
 
+
 def dump_cookie(value):
     config_parser = configparser.ConfigParser()
     config_parser.read('cookie.ini')
-    
+
     with open('cookie.ini', 'w') as cookie_file:
         config_parser['cookie_values'] = {
             '_kawlt': value
         }
         config_parser.write(cookie_file)
+
 
 # cookie 경로가 입력되지 않았을시, 쿠키 파일이 Default 경로에 있는지 확인함
 # 경로가 입력되었거나, Default 경로의 쿠키가 존재해야 global jar 함수에 cookie를 로드함.
@@ -163,6 +166,7 @@ def load_cookie_from_chrome() -> None:
             dump_cookie(cookie.value)
             break
 
+
 def load_search_time():
     global search_time
 
@@ -187,7 +191,7 @@ def check_user_info_loaded():
     if user_info_json.get('error'):
         # cookie.ini에 있는 쿠키가 유통기한 지났을 수 있다
         # 비교 위해서 cookie.ini 쿠키를 'prev_jar'에 저장한다
-        prev_jar = jar 
+        prev_jar = jar
         load_cookie_from_chrome()
 
         # 크롬 브라우저에서 새로운 쿠키를 찾았으면 다시 체크 시작 한다
@@ -213,9 +217,12 @@ def check_user_info_loaded():
             elif key == 'status' and value == "UNKNOWN":
                 print("상태를 알 수 없는 사용자입니다. 1339 또는 보건소에 문의해주세요.")
                 close()
-            else:
+            elif key == 'status' and value == "ALREADY_RESERVED":
                 print("이미 접종이 완료되었거나 예약이 완료된 사용자입니다.")
-                close(success=None)
+                close()
+            else:
+                print(f"알 수 없는 사용자 상태({value})입니다.")
+                close()
 
 
 def fill_str_with_space(input_s, max_size=40, fill_char=" "):
@@ -347,6 +354,7 @@ def input_config():
 
     dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
     return vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left
+
 
 # pylint: disable=too-many-arguments
 def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
@@ -492,6 +500,7 @@ def retry_reservation(organization_code, vaccine_type):
             print(response.text)
             close()
 
+
 # ===================================== def ===================================== #
 
 
@@ -522,7 +531,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
                 json_data = json.loads(response.text)
                 pretty_print(json_data)
                 print(datetime.now())
-
                 for x in json_data.get("organizations"):
                     if x.get('status') == "AVAILABLE" or x.get('leftCounts') != 0:
                         found = x
@@ -533,7 +541,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
                 print("JSONDecodeError : ", decodeerror)
                 print("JSON string : ", response.text)
                 close()
-
 
         except requests.exceptions.Timeout as timeouterror:
             print("Timeout Error : ", timeouterror)
@@ -575,7 +582,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
             check_organization_response.text).get("lefts")
         for x in check_organization_data:
             if x.get('leftCount') != 0:
-                found = x
                 print(f"{x.get('vaccineName')} 백신을 {x.get('leftCount')}개 발견했습니다.")
                 vaccine_found_code = x.get('vaccineCode')
                 break
@@ -593,7 +599,6 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
         return None
 
 
-
 def main_function():
     got_cookie = load_saved_cookie()
     if got_cookie is False:
@@ -608,7 +613,6 @@ def main_function():
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
     find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
     close()
-
 
 
 def send_msg(msg):
