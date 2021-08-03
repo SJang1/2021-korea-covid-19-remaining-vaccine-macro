@@ -99,7 +99,7 @@ def load_saved_cookie() -> bool:
 
             jar = {'_kawlt': cookie}
             return True
-        except:
+        except Exception:
             return False
 
     return False
