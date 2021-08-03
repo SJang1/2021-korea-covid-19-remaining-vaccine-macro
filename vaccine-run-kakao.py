@@ -83,10 +83,40 @@ def load_cookie_config():
             return None
     return None
 
+def load_saved_cookie() -> bool:
+    #  print('saved cookie loading')
+    config_parser = configparser.ConfigParser(interpolation=None)
+
+    global jar
+
+    if os.path.exists('cookie.ini'):
+        try:
+            config_parser.read('cookie.ini')
+            cookie = config_parser['cookie_values']['_kawlt'].strip()
+
+            if cookie is None or cookie == '':
+                return False
+
+            jar = {'_kawlt': cookie}
+            return True
+        except:
+            return False
+
+    return False
+
+def dump_cookie(value):
+    config_parser = configparser.ConfigParser()
+    config_parser.read('cookie.ini')
+    
+    with open('cookie.ini', 'w') as cookie_file:
+        config_parser['cookie_values'] = {
+            '_kawlt': value
+        }
+        config_parser.write(cookie_file)
 
 # cookie 경로가 입력되지 않았을시, 쿠키 파일이 Default 경로에 있는지 확인함
 # 경로가 입력되었거나, Default 경로의 쿠키가 존재해야 global jar 함수에 cookie를 로드함.
-def load_cookie():
+def load_cookie_from_chrome() -> None:
     global jar
 
     cookie_file = load_cookie_config()
@@ -118,13 +148,32 @@ def load_cookie():
     jar = browser_cookie3.chrome(
         cookie_file=cookie_file, domain_name=".kakao.com")
 
+    # 쿠키를 cookie.ini에 저장한다
+    for cookie in jar:
+        if cookie.name == '_kawlt':
+            dump_cookie(cookie.value)
+            break
+
+    return
 
 def check_user_info_loaded():
+    global jar
     user_info_api = 'https://vaccine.kakao.com/api/v1/user'
     user_info_response = requests.get(
         user_info_api, headers=Headers.headers_vacc, cookies=jar, verify=False)
     user_info_json = json.loads(user_info_response.text)
     if user_info_json.get('error'):
+        # cookie.ini에 있는 쿠키가 유통기한 지났을 수 있다
+        # 비교 위해서 cookie.ini 쿠키를 'prev_jar'에 저장한다
+        prev_jar = jar 
+        load_cookie_from_chrome()
+
+        # 크롬 브라우저에서 새로운 쿠키를 찾았으면 다시 체크 시작 한다
+        if prev_jar != jar:
+            #  print('new cookie value from chrome detected')
+            check_user_info_loaded()
+            return
+
         print("사용자 정보를 불러오는데 실패하였습니다.")
         print("Chrome 브라우저에서 카카오에 제대로 로그인되어있는지 확인해주세요.")
         print("로그인이 되어 있는데도 안된다면, 카카오톡에 들어가서 잔여백신 알림 신청을 한번 해보세요. 정보제공 동의가 나온다면 동의 후 다시 시도해주세요.")
@@ -510,8 +559,12 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
 
 
 def main_function():
-    load_cookie()
+    got_cookie = load_saved_cookie()
+    if got_cookie is False:
+        load_cookie_from_chrome()
+
     check_user_info_loaded()
+
     previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
     if previous_used_type is None:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
