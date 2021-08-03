@@ -130,9 +130,9 @@ def load_cookie():
 def load_search_time():
     global search_time
 
-    config_parser = configparser.ConfigParser(interpolation=None)
-    if os.path.exists('cookie.ini'):
-        config_parser.read('cookie.ini')
+    config_parser = configparser.ConfigParser()
+    if os.path.exists('config.ini'):
+        config_parser.read('config.ini')
         input_time = config_parser.getfloat(
             'config', 'search_time', fallback=0.2)
 
