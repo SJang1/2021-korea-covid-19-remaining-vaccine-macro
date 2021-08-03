@@ -557,7 +557,7 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
             close()
 
     if found is None:
-        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
         return None
 
     print(f"{found.get('orgName')} 에서 백신을 {found.get('leftCounts')}개 발견했습니다.")
