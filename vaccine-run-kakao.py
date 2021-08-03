@@ -48,12 +48,13 @@ def load_config():
                 previous_top_y = configuration["topY"]
                 previous_bottom_x = configuration["botX"]
                 previous_bottom_y = configuration["botY"]
-                return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
+                previous_only_left = configuration["onlyLeft"] == "True"
+                return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, previous_only_left
             else:
-                return None, None, None, None, None
+                return None, None, None, None, None, None
         except ValueError:
-            return None, None, None, None, None
-    return None, None, None, None, None
+            return None, None, None, None, None, None
+    return None, None, None, None, None, None
 
 
 # cookie.ini 안의 [chrome][cookie_file] 에서 경로를 로드함.
@@ -333,11 +334,22 @@ def input_config():
             print(f"올바른 좌표 값이 아닙니다. 입력 값 : {bottom_y}")
             bottom_y = None
 
-    dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y)
-    return vaccine_type, top_x, top_y, bottom_x, bottom_y
+    only_left = None
+    while only_left is None:
+        only_left = str.lower(input("남은 잔여백신이 있는 병원만 조회하시겠습니까? Y/N : "))
+        if only_left == "y":
+            only_left = True
+        elif only_left == "n":
+            only_left = False
+        else:
+            print("Y 또는 N을 입력해 주세요.")
+            only_left = None
+
+    dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
+    return vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left
 
 
-def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
+def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
     config_parser = configparser.ConfigParser()
     config_parser['config'] = {}
     conf = config_parser['config']
@@ -347,6 +359,7 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     conf["botX"] = bottom_x
     conf["botY"] = bottom_y
     conf["search_time"] = search_time
+    conf["onlyLeft"] = "True" if only_left else "False"
 
     with open("config.ini", "w") as config_file:
         config_parser.write(config_file)
@@ -492,9 +505,9 @@ def retry_reservation(organization_code, vaccine_type):
 #     print(cookie)
 
 # pylint: disable=too-many-locals,too-many-statements,too-many-branches
-def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
+def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left):
     url = 'https://vaccine-map.kakao.com/api/v3/vaccine/left_count_by_coords'
-    data = {"bottomRight": {"x": bottom_x, "y": bottom_y}, "onlyLeft": False, "order": "latitude",
+    data = {"bottomRight": {"x": bottom_x, "y": bottom_y}, "onlyLeft": only_left, "order": "latitude",
             "topLeft": {"x": top_x, "y": top_y}}
     done = False
     found = None
@@ -576,8 +589,9 @@ def find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y):
     if vaccine_found_code and try_reservation(organization_code, vaccine_found_code):
         return None
     else:
-        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
+        find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
         return None
+
 
 
 def main_function():
@@ -587,14 +601,14 @@ def main_function():
 
     load_search_time()
     check_user_info_loaded()
-
-    previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y = load_config()
+    previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, only_left = load_config()
     if previous_used_type is None:
-        vaccine_type, top_x, top_y, bottom_x, bottom_y = input_config()
+        vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left = input_config()
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
-    find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y)
+    find_vaccine(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
     close()
+
 
 
 def send_msg(msg):
