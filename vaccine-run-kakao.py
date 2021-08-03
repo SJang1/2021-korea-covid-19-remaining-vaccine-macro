@@ -145,8 +145,8 @@ def load_search_time():
         input_time = config_parser.getfloat(
             'config', 'search_time', fallback=0.2)
 
-        if input_time < 0.2:
-            search_time = 0.2
+        if input_time < 0.1:
+            search_time = 0.1
         else:
             search_time = input_time
 
