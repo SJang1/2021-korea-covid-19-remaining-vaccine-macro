@@ -154,8 +154,6 @@ def load_cookie_from_chrome() -> None:
             dump_cookie(cookie.value)
             break
 
-    return
-
 def check_user_info_loaded():
     global jar
     user_info_api = 'https://vaccine.kakao.com/api/v1/user'
