@@ -36,6 +36,11 @@ jobs:
     needs: lint
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+        
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -43,17 +48,15 @@ jobs:
         path: |
           ~\AppData\Local\pip\Cache
           ~\AppData\Local\Nuitka\Nuitka
+          ${{ env.pythonLocation }}
           vaccine-run-kakao.build
           vaccine-run-kakao.dist
           vaccine-run-kakao.onefile-build
         # An explicit key for restoring and saving the cache
-        key: ${{ runner.os }}-cache-${{ hashFiles('requirements.txt') }}
+        key: ${{ runner.os }}-cache-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
         restore-keys: |
+          ${{ runner.os }}-cache-${{ env.pythonLocation }}-
           ${{ runner.os }}-cache-
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
 
     - name: Install dependencies
       run: |
