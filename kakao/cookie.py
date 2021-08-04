@@ -4,7 +4,6 @@ import os
 
 # cookie.ini 안의 [chrome][cookie_file] 에서 경로를 로드함.
 import platform
-from typing import Optional
 import browser_cookie3
 from kakao.common import close
 
