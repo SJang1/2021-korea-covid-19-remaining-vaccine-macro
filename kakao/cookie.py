@@ -72,7 +72,7 @@ def dump_cookie(value):
 
 # cookie 경로가 입력되지 않았을시, 쿠키 파일이 Default 경로에 있는지 확인함
 # 경로가 입력되었거나, Default 경로의 쿠키가 존재해야 global jar 함수에 cookie를 로드함.
-def load_cookie_from_chrome() -> Optional[dict]:
+def load_cookie_from_chrome():
     cookie_file = load_cookie_config()
     if cookie_file is False:
         return None
