@@ -4,7 +4,7 @@ import os
 
 # cookie.ini 안의 [chrome][cookie_file] 에서 경로를 로드함.
 import platform
-from typing import Union
+from typing import Optional
 import browser_cookie3
 from kakao.common import close
 
@@ -72,7 +72,7 @@ def dump_cookie(value):
 
 # cookie 경로가 입력되지 않았을시, 쿠키 파일이 Default 경로에 있는지 확인함
 # 경로가 입력되었거나, Default 경로의 쿠키가 존재해야 global jar 함수에 cookie를 로드함.
-def load_cookie_from_chrome() -> Union[dict, None]:
+def load_cookie_from_chrome() -> Optional[dict]:
     cookie_file = load_cookie_config()
     if cookie_file is False:
         return None
