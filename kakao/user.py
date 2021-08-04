@@ -14,14 +14,12 @@ def check_user_info_loaded(jar):
     user_info_json = json.loads(user_info_response.text)
     if user_info_json.get('error'):
         # cookie.ini 에 있는 쿠키가 유통기한 지났을 수 있다
-        # 비교 위해서 cookie.ini 쿠키를 'prev_jar'에 저장한다
-        prev_jar = jar
-        load_cookie_from_chrome()
+        chrome_cookie = load_cookie_from_chrome()
 
         # 크롬 브라우저에서 새로운 쿠키를 찾았으면 다시 체크 시작 한다
-        if prev_jar != jar:
+        if jar != chrome_cookie:
             #  print('new cookie value from chrome detected')
-            check_user_info_loaded(jar)
+            check_user_info_loaded(chrome_cookie)
             return
 
         print("사용자 정보를 불러오는데 실패하였습니다.")
