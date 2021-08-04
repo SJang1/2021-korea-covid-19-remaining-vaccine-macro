@@ -18,9 +18,6 @@ jobs:
           ~/.cache/pip
           ${{ env.pythonLocation }}
         key: ${{ runner.os }}-lint-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-lint-${{ env.pythonLocation }}-
-          ${{ runner.os }}-lint-
 
     - name: Install dependencies
       run: |
@@ -54,9 +51,6 @@ jobs:
           vaccine-run-kakao.onefile-build
         # An explicit key for restoring and saving the cache
         key: ${{ runner.os }}-cache-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cache-${{ env.pythonLocation }}-
-          ${{ runner.os }}-cache-
 
     - name: Install dependencies
       run: |
@@ -88,9 +82,7 @@ jobs:
       with:
         path: ${{ env.pythonLocation }}
         key: ${{ runner.os }}-cache-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt', 'requirements-mac.txt', 'requirements-dev.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cache-${{ env.pythonLocation }}-
-          ${{ runner.os }}-cache-
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
