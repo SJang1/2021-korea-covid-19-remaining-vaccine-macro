@@ -2,6 +2,7 @@ import configparser
 import os
 
 from kakao.common import fill_str_with_space
+from kakao.common import close
 
 
 def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
