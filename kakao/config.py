@@ -134,7 +134,7 @@ def load_config():
                 previous_bottom_y = configuration["botY"]
                 previous_only_left = configuration["onlyLeft"] == "True"
             except KeyError:
-                print('ERROR: config.ini가 손상되었습니다. 파일 삭제 후 다시 설정해주세요.')
+                print('ERROR: 기존에 입력한 설정에서 누락된 정보가 있습니다. config.ini 파일 삭제 후 다시 설정해주세요.')
                 close()
             
             vacc_name = {"ANY": "아무거나", "VEN00013": "화이자", "VEN00014": "모더나", "VEN00015": "아스트라제네카", "VEN00016": "얀센"}
