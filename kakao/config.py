@@ -136,6 +136,15 @@ def load_config():
                 print('ERROR: config.ini가 손상되었습니다. 파일 삭제 후 다시 설정해주세요.')
                 close()
             
+            vacc_name = {"ANY": "아무거나", "VEN00013": "화이자", "VEN00014": "모더나", "VEN00015": "아스트라제네카", "VEN00016": "얀센"}
+            print("\n[현재 설정]")
+            print(f"백신 종류: {previous_used_type} ({vacc_name[previous_used_type]})")
+            print("top_x:", previous_top_x)
+            print("top_y:", previous_top_y)
+            print("bottom_x:", previous_bottom_x)
+            print("bottom_y:", previous_bottom_y)
+            print(f"only_left: {previous_only_left} ({'잔여백신이 있는 병원만 조회' if previous_only_left else '모든 병원 조회'})")
+            
             while True:
                 skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
                 if skip_input == "y":
