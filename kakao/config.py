@@ -122,6 +122,20 @@ def load_config():
     if os.path.exists('config.ini'):
         try:
             config_parser.read('config.ini')
+            
+            try:
+                # 설정 파일이 있으면 최근 로그인 정보 로딩
+                configuration = config_parser['config']
+                previous_used_type = configuration["VAC"]
+                previous_top_x = configuration["topX"]
+                previous_top_y = configuration["topY"]
+                previous_bottom_x = configuration["botX"]
+                previous_bottom_y = configuration["botY"]
+                previous_only_left = configuration["onlyLeft"] == "True"
+            except KeyError:
+                print('ERROR: config.ini가 손상되었습니다. 파일 삭제 후 다시 설정해주세요.')
+                close()
+            
             while True:
                 skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
                 if skip_input == "y":
@@ -134,20 +148,8 @@ def load_config():
                     print("Y 또는 N을 입력해 주세요.")
 
             if skip_input:
-                try:
-                    # 설정 파일이 있으면 최근 로그인 정보 로딩
-                    configuration = config_parser['config']
-                    previous_used_type = configuration["VAC"]
-                    previous_top_x = configuration["topX"]
-                    previous_top_y = configuration["topY"]
-                    previous_bottom_x = configuration["botX"]
-                    previous_bottom_y = configuration["botY"]
-                    previous_only_left = configuration["onlyLeft"] == "True"
-                    return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, previous_only_left
-                except KeyError:
-                    print('기존에 입력한 정보가 없습니다.')
-            else:
-                return None, None, None, None, None, None
+                return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, previous_only_left
+
         except ValueError:
             return None, None, None, None, None, None
     return None, None, None, None, None, None
