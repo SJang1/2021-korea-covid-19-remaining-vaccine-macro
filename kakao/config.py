@@ -4,6 +4,17 @@ import os
 from kakao.common import fill_str_with_space
 from kakao.common import close
 
+vaccine_candidates = [
+    {"name": "아무거나", "code": "ANY"},
+    {"name": "화이자", "code": "VEN00013"},
+    {"name": "모더나", "code": "VEN00014"},
+    {"name": "아스트라제네카", "code": "VEN00015"},
+    {"name": "얀센", "code": "VEN00016"},
+    {"name": "(미사용)", "code": "VEN00017"},
+    {"name": "(미사용)", "code": "VEN00018"},
+    {"name": "(미사용)", "code": "VEN00019"},
+    {"name": "(미사용)", "code": "VEN00020"},
+]
 
 def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
     korea_coordinate = {  # Republic of Korea coordinate
@@ -26,17 +37,6 @@ def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
 
 # pylint: disable=too-many-branches
 def input_config():
-    vaccine_candidates = [
-        {"name": "아무거나", "code": "ANY"},
-        {"name": "화이자", "code": "VEN00013"},
-        {"name": "모더나", "code": "VEN00014"},
-        {"name": "아스트라제네카", "code": "VEN00015"},
-        {"name": "얀센", "code": "VEN00016"},
-        {"name": "(미사용)", "code": "VEN00017"},
-        {"name": "(미사용)", "code": "VEN00018"},
-        {"name": "(미사용)", "code": "VEN00019"},
-        {"name": "(미사용)", "code": "VEN00020"},
-    ]
     vaccine_type = None
     while True:
         print("=== 백신 목록 ===")
@@ -137,9 +137,8 @@ def load_config():
                 print('ERROR: 기존에 입력한 설정에서 누락된 정보가 있습니다. config.ini 파일 삭제 후 다시 설정해주세요.')
                 close()
             
-            vacc_name = {"ANY": "아무거나", "VEN00013": "화이자", "VEN00014": "모더나", "VEN00015": "아스트라제네카", "VEN00016": "얀센"}
             print("\n[현재 설정]")
-            print(f"백신 종류: {previous_used_type} ({vacc_name[previous_used_type]})")
+            print(f"백신 종류: {previous_used_type} ({next(x['name'] for x in vaccine_candidates if x['code'] == previous_used_type)})")
             print("top_x:", previous_top_x)
             print("top_y:", previous_top_y)
             print("bottom_x:", previous_bottom_x)
