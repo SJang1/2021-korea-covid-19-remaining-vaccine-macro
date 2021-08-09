@@ -1,5 +1,6 @@
 import configparser
 import os
+import json
 
 from kakao.common import fill_str_with_space
 
@@ -26,7 +27,6 @@ def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
 # pylint: disable=too-many-branches
 def input_config():
     vaccine_candidates = [
-        {"name": "아무거나", "code": "ANY"},
         {"name": "화이자", "code": "VEN00013"},
         {"name": "모더나", "code": "VEN00014"},
         {"name": "아스트라제네카", "code": "VEN00015"},
@@ -37,43 +37,17 @@ def input_config():
         {"name": "(미사용)", "code": "VEN00020"},
     ]
     vaccine_type = None
-    while True:
+    while vaccine_type is None:
         print("=== 백신 목록 ===")
         for vaccine in vaccine_candidates:
             if vaccine["name"] == "(미사용)":
                 continue
-            print(
-                f"{fill_str_with_space(vaccine['name'], 10)} : {vaccine['code']}")
+            print(f"{fill_str_with_space(vaccine['name'], 10)} : {vaccine['code']}")
 
-        vaccine_type = str.upper(input("예약시도할 백신 코드를 알려주세요: ").strip())
-        if any(x["code"] == vaccine_type for x in vaccine_candidates) or vaccine_type.startswith("FORCE:"):
-            if vaccine_type.startswith("FORCE:"):
-                vaccine_type = vaccine_type[6:]
-
-                print("경고: 강제 코드 입력모드를 사용하셨습니다.\n" +
-                      "이 모드는 새로운 백신이 예약된 코드로 **등록되지 않은 경우에만** 사용해야 합니다.\n" +
-                      "입력하신 코드가 정상적으로 작동하는 백신 코드인지 필히 확인해주세요.\n" +
-                      f"현재 코드: '{vaccine_type}'\n")
-
-                if len(vaccine_type) != 8 or not vaccine_type.startswith("VEN") or not vaccine_type[3:].isdigit():
-                    print("입력하신 코드가 현재 알려진 백신 코드 형식이랑 맞지 않습니다.")
-                    proceed = str.lower(input("진행하시겠습니까? Y/N : "))
-                    if proceed == "y":
-                        pass
-                    elif proceed == "n":
-                        continue
-                    else:
-                        print("Y 또는 N을 입력해 주세요.")
-                        continue
-
-            if next((x for x in vaccine_candidates if x["code"] == vaccine_type), {"name": ""})["name"] == "(미사용)":
-                print("현재 프로그램 버전에서 백신 이름이 등록되지 않은, 추후를 위해 미리 넣어둔 백신 코드입니다.\n" +
-                      "입력하신 코드가 정상적으로 작동하는 백신 코드인지 필히 확인해주세요.\n" +
-                      f"현재 코드: '{vaccine_type}'\n")
-
-            break
-        else:
-            print("백신 코드를 확인해주세요.")
+        vaccine_type = [x.strip() for x in str.upper(input("예약시도할 백신 코드를 모두 알려주세요. 먼저 입력할수록 우선순위가 높습니다: ").strip()).split(",")]
+        if not all(verify_vaccine_code(vaccine, vaccine_candidates) for vaccine in vaccine_type):
+            vaccine_type = None
+    print("선택한 백신은", ", ".join([f"{i}순위 {list(filter(lambda vaccine: vaccine['code'] == v, vaccine_candidates))[0]['name']}" for i, v in enumerate(vaccine_type)]), "입니다.\n")
 
     print("사각형 모양으로 백신범위를 지정한 뒤, 해당 범위 안에 있는 백신을 조회해서 남은 백신이 있으면 해당 병원에 예약을 시도합니다.")
     print("경위도는 구글 맵에서 원하는 위치를 우클릭하여 복사할 수 있습니다.")
@@ -137,7 +111,7 @@ def load_config():
                 try:
                     # 설정 파일이 있으면 최근 로그인 정보 로딩
                     configuration = config_parser['config']
-                    previous_used_type = configuration["VAC"]
+                    previous_used_type = json.loads(configuration["VAC"])
                     previous_top_x = configuration["topX"]
                     previous_top_y = configuration["topY"]
                     previous_bottom_x = configuration["botX"]
@@ -158,7 +132,7 @@ def dump_config(vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left, searc
     config_parser = configparser.ConfigParser()
     config_parser['config'] = {}
     conf = config_parser['config']
-    conf['VAC'] = vaccine_type
+    conf['VAC'] = json.dumps(vaccine_type)
     conf["topX"] = top_x
     conf["topY"] = top_y
     conf["botX"] = bottom_x
@@ -191,3 +165,33 @@ def load_search_time():
         else:
             search_time = input_time
     return search_time
+
+def verify_vaccine_code(vaccine_type, vaccine_candidates):
+    if any(x["code"] == vaccine_type for x in vaccine_candidates) or vaccine_type.startswith("FORCE:"):
+        if vaccine_type.startswith("FORCE:"):
+            vaccine_type = vaccine_type[6:]
+
+            print("경고: 강제 코드 입력모드를 사용하셨습니다.\n" +
+                  "이 모드는 새로운 백신이 예약된 코드로 **등록되지 않은 경우에만** 사용해야 합니다.\n" +
+                  "입력하신 코드가 정상적으로 작동하는 백신 코드인지 필히 확인해주세요.\n" +
+                  f"현재 코드: '{vaccine_type}'\n")
+
+            if len(vaccine_type) != 8 or not vaccine_type.startswith("VEN") or not vaccine_type[3:].isdigit():
+                print("입력하신 코드가 현재 알려진 백신 코드 형식이랑 맞지 않습니다.")
+                proceed = str.lower(input("진행하시겠습니까? Y/N : "))
+                if proceed == "y":
+                    pass
+                elif proceed == "n":
+                    return False
+                else:
+                    print("Y 또는 N을 입력해 주세요.")
+                    return False
+
+        if next((x for x in vaccine_candidates if x["code"] == vaccine_type), {"name": ""})["name"] == "(미사용)":
+            print("현재 프로그램 버전에서 백신 이름이 등록되지 않은, 추후를 위해 미리 넣어둔 백신 코드입니다.\n" +
+                  "입력하신 코드가 정상적으로 작동하는 백신 코드인지 필히 확인해주세요.\n" +
+                  f"현재 코드: '{vaccine_type}'\n")
+
+        return True
+    else:
+        print("백신 코드를 확인해주세요.")
