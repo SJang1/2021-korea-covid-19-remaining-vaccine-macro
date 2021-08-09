@@ -63,7 +63,7 @@ jobs:
 
     - name: Make OneFile
       run: |
-        nuitka --assume-yes-for-downloads --show-scons --no-progress --include-data-file="./*.mp3=./" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
+        nuitka --assume-yes-for-downloads --show-scons --no-progress --include-data-file="./kakao/sound/*.mp3=./kakao/sound/" --onefile -o vaccine-run-kakao.exe vaccine-run-kakao.py
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
@@ -95,7 +95,7 @@ jobs:
         python -m pip install pytest -r requirements.txt -r requirements-mac.txt -r requirements-dev.txt
     - name: Make OneFile
       run: |
-        pyinstaller --add-data "*.mp3:." --onefile vaccine-run-kakao.py
+        pyinstaller --add-data "kakao/sound/*.mp3:./sound" --onefile vaccine-run-kakao.py
         chmod +x dist/vaccine-run-kakao
     - name: Tar file
       run: tar -cvf dist/vaccine-run-kakao.tar dist/vaccine-run-kakao
