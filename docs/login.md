@@ -10,7 +10,7 @@
 
 ## "error":"error occurred"
 - [잔여백신 본인정보 확인 API](https://vaccine.kakao.com/api/v1/user)를 요청했을 때 브라우저에 `"error":"error occurred"` 메세지가 반환되는 계정이 있습니다. 
-[여기를 클릭하여](./docs/kakao-policy-agreement.md) 정보제공 동의를 해결해주세요.
+[여기를 클릭하여](./kakao-policy-agreement.md) 정보제공 동의를 해결해주세요.
 
 ## Chrome 설정
 - `설정` - `쿠키 및 기타 사이트 데이터` - `모든 쿠키 허용` 으로 설정해주세요.
