@@ -6,30 +6,8 @@ name: Python package
 on: [push, pull_request]
 
 jobs:
-  lint:
-    name: Lint python
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-lint-cache-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-lint-cache-
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip wheel
-        python -m pip install prospector pytest -r requirements.txt
-
-    - name: Lint via prospector
-      run: python -m prospector
-
   Windows-Build:
     runs-on: windows-latest
-    needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -58,8 +36,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip wheel
-        python -m pip install nuitka pytest zstandard -r requirements.txt
+        python -m pip install --upgrade pip
+        python -m pip install pytest wheel nuitka zstandard
+        python -m pip install -r requirements.txt
 
     - name: Make OneFile
       run: |
@@ -73,7 +52,6 @@ jobs:
 
   MacOS-Build:
     runs-on: macos-latest
-    needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -91,8 +69,9 @@ jobs:
         key: ${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt', 'requirements-mac.txt', 'requirements-dev.txt') }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip wheel
-        python -m pip install pytest -r requirements.txt -r requirements-mac.txt -r requirements-dev.txt
+        python -m pip install --upgrade pip
+        python -m pip install pytest wheel
+        python -m pip install -r requirements.txt -r requirements-mac.txt -r requirements-dev.txt
     - name: Make OneFile
       run: |
         pyinstaller --add-data "kakao/sound/*.mp3:./sound" --onefile vaccine-run-kakao.py
