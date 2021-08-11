@@ -52,6 +52,8 @@ def load_saved_cookie() -> (bool, dict):
 
             jar = {'_kawlt': cookie}
             return True, jar
+        except KeyError:
+            pass
         finally:
             pass
     return False, None

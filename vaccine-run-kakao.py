@@ -19,7 +19,9 @@ def main_function():
         vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left = input_config()
     else:
         vaccine_type, top_x, top_y, bottom_x, bottom_y = previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y
-    find_vaccine(cookie, search_time, vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
+    no_vaccine = True
+    while no_vaccine:
+        no_vaccine = find_vaccine(cookie, search_time, vaccine_type, top_x, top_y, bottom_x, bottom_y, only_left)
     close()
 
 
