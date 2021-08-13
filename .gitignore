@@ -10,3 +10,4 @@ venv/
 # Who uses Pipenv/Pipfile?
 Pipfile
 Pipfile.lock
+kakao/__pycache__/
