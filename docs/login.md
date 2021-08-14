@@ -2,12 +2,15 @@
 ## 기본 로그인 방법
 - [여기를 클릭하여](https://accounts.kakao.com/login?continue=https%3A%2F%2Fvaccine-map.kakao.com%2Fmap2%3Fv%3D1) 카카오 계정 로그인 페이지로 이동한 다음에 로그인을 해주세요.
 - 로그인 완료 후 카카오 [잔여백신 본인정보 확인 API](https://vaccine.kakao.com/api/v1/user)에서 본인의 정보가 정상적으로 표시되는지 확인합니다. 
-- 정상적으로 표시되지 않는 경우 [이 페이지에 접근하여](https://vaccine.kakao.com/agreement) 잔여백신 예약 정보제공동의를 진행해주세요.
 
 ## 카카오 계정 로그인 시 주의사항
 - 시크릿 모드에서 로그인하시면 안됩니다.
 - 로그인 전 반드시 `로그인 상태 유지`를 체크해주세요.
 - 로그인 이후 [카카오 잔여백신 맵](https://vaccine-map.kakao.com/map2?v=1)에 한번 이상 접근해야 합니다.
+
+## "error":"error occurred"
+- [잔여백신 본인정보 확인 API](https://vaccine.kakao.com/api/v1/user)를 요청했을 때 브라우저에 `"error":"error occurred"` 메세지가 반환되는 계정이 있습니다. 
+[여기를 클릭하여](./kakao-policy-agreement.md) 정보제공 동의를 해결해주세요.
 
 ## Chrome 설정
 - `설정` - `쿠키 및 기타 사이트 데이터` - `모든 쿠키 허용` 으로 설정해주세요.
