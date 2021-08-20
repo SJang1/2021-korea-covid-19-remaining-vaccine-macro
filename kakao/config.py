@@ -3,7 +3,19 @@ import os
 import json
 
 from kakao.common import fill_str_with_space
+from kakao.common import close
 
+vaccine_candidates = [
+    {"name": "아무거나", "code": "ANY"},
+    {"name": "화이자", "code": "VEN00013"},
+    {"name": "모더나", "code": "VEN00014"},
+    {"name": "아스트라제네카", "code": "VEN00015"},
+    {"name": "얀센", "code": "VEN00016"},
+    {"name": "(미사용)", "code": "VEN00017"},
+    {"name": "(미사용)", "code": "VEN00018"},
+    {"name": "(미사용)", "code": "VEN00019"},
+    {"name": "(미사용)", "code": "VEN00020"},
+]
 
 def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
     korea_coordinate = {  # Republic of Korea coordinate
@@ -26,16 +38,6 @@ def is_in_range(coord_type, coord, user_min_x=-180.0, user_max_y=90.0):
 
 # pylint: disable=too-many-branches
 def input_config():
-    vaccine_candidates = [
-        {"name": "화이자", "code": "VEN00013"},
-        {"name": "모더나", "code": "VEN00014"},
-        {"name": "아스트라제네카", "code": "VEN00015"},
-        {"name": "얀센", "code": "VEN00016"},
-        {"name": "(미사용)", "code": "VEN00017"},
-        {"name": "(미사용)", "code": "VEN00018"},
-        {"name": "(미사용)", "code": "VEN00019"},
-        {"name": "(미사용)", "code": "VEN00020"},
-    ]
     vaccine_type = None
     while vaccine_type is None:
         print("=== 백신 목록 ===")
@@ -97,6 +99,34 @@ def load_config():
     if os.path.exists('config.ini'):
         try:
             config_parser.read('config.ini')
+            
+            try:
+                # 설정 파일이 있으면 최근 로그인 정보 로딩
+                configuration = config_parser['config']
+                previous_used_type = json.loads(configuration["VAC"])
+                previous_top_x = configuration["topX"]
+                previous_top_y = configuration["topY"]
+                previous_bottom_x = configuration["botX"]
+                previous_bottom_y = configuration["botY"]
+                previous_only_left = None if not configuration["onlyLeft"] else configuration["onlyLeft"] == "True"
+
+                if not (previous_used_type and previous_top_x and previous_top_y and previous_bottom_x and previous_bottom_y and previous_only_left != None):
+                    raise
+
+                message = ("\n[현재 설정]"
+                           f"\n백신 종류: {[(x['code']+'('+x['name']+')') for x in vaccine_candidates if x['code'] in previous_used_type]}"
+                           f"\ntop_x: {previous_top_x}"
+                           f"\ntop_y: {previous_top_y}"
+                           f"\nbottom_x: {previous_bottom_x}"
+                           f"\nbottom_y: {previous_bottom_y}"
+                           f"\nonly_left: {previous_only_left} ({'잔여백신이 있는 병원만 조회' if previous_only_left else '모든 병원 조회'})"
+                )
+                print(message)
+
+            except:
+                print('ERROR: 기존에 입력한 설정에서 누락된 정보가 있습니다. config.ini 파일 삭제 후 다시 설정해주세요.')
+                close()
+
             while True:
                 skip_input = str.lower(input("기존에 입력한 정보로 재검색하시겠습니까? Y/N : "))
                 if skip_input == "y":
@@ -109,20 +139,8 @@ def load_config():
                     print("Y 또는 N을 입력해 주세요.")
 
             if skip_input:
-                try:
-                    # 설정 파일이 있으면 최근 로그인 정보 로딩
-                    configuration = config_parser['config']
-                    previous_used_type = json.loads(configuration["VAC"])
-                    previous_top_x = configuration["topX"]
-                    previous_top_y = configuration["topY"]
-                    previous_bottom_x = configuration["botX"]
-                    previous_bottom_y = configuration["botY"]
-                    previous_only_left = configuration["onlyLeft"] == "True"
-                    return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, previous_only_left
-                except KeyError:
-                    print('기존에 입력한 정보가 없습니다.')
-            else:
-                return None, None, None, None, None, None
+                return previous_used_type, previous_top_x, previous_top_y, previous_bottom_x, previous_bottom_y, previous_only_left
+
         except ValueError:
             return None, None, None, None, None, None
     return None, None, None, None, None, None
