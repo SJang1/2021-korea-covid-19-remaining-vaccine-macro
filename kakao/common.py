@@ -6,6 +6,8 @@ import unicodedata
 import telepot
 from playsound import playsound, PlaysoundException
 
+# slack 처리 추가
+from slacker import Slacker
 
 def close(success=False):
     if success is True:
@@ -57,10 +59,22 @@ def send_msg(msg):
             telegram_id = config_parser["telegram"]["chatid"]
             bot = telepot.Bot(telegram_token)
             bot.sendMessage(telegram_id, msg)
-            return
+            #return
         except Exception as e:
             print("Telegram Error : ", e)
-            return
+            #return
+    # slack 처리 추가
+    if os.path.exists('slack.ini'):
+        try:
+            config_parser.read('slack.ini')
+            # slack 발급받은 토큰값
+            slack_token = config_parser["slack"]["token"]
+            # slack 에서 메시지 보낼 채널
+            slack_channel = config_parser["slack"]["channel"]
+            slack = Slacker(slack_token)
+            slack.chat.post_message(channel= slack_channel,text=msg )
+        except Exception as e:
+            print("slack Error : ", e)
 
 
 def pretty_print(json_object):
